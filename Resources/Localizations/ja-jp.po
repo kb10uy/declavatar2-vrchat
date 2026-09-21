@@ -1,6 +1,9 @@
 msgid ""
 msgstr ""
-"Language: ja-JP\n"
+"Language: ja-jp\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 msgid "declavatar2.declaration.no_script"
 msgstr "Declavatar Declaration にスクリプトが設定されていません"

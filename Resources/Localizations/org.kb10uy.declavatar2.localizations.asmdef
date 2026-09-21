@@ -1,0 +1,16 @@
+{
+    "name": "org.kb10uy.declavatar2.localizations",
+    "rootNamespace": "KusakaFactory.Declavatar2",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

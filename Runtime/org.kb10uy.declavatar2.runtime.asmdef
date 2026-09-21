@@ -2,9 +2,7 @@
     "name": "org.kb10uy.declavatar2.runtime",
     "rootNamespace": "KusakaFactory.Declavatar2.Runtime",
     "references": [],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

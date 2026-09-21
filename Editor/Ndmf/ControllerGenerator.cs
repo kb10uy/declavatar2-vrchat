@@ -1,0 +1,178 @@
+using System;
+using System.Collections.Immutable;
+using System.Linq;
+using KusakaFactory.Declavatar2.Data;
+using nadena.dev.modular_avatar.core;
+using nadena.dev.ndmf.animator;
+using UnityEngine;
+using VRC.SDK3.Avatars.Components;
+using AnimatorCondition = KusakaFactory.Declavatar2.Data.AnimatorCondition;
+using AnimatorLayer = KusakaFactory.Declavatar2.Data.AnimatorLayer;
+using AnimatorTransition = KusakaFactory.Declavatar2.Data.AnimatorTransition;
+using UnityCondition = UnityEditor.Animations.AnimatorCondition;
+using UnityConditionMode = UnityEditor.Animations.AnimatorConditionMode;
+using UnityController = UnityEditor.Animations.AnimatorController;
+
+namespace KusakaFactory.Declavatar2.Ndmf
+{
+    internal sealed class ControllerGenerator
+    {
+        private readonly GenerationContext _context;
+
+        public ControllerGenerator(GenerationContext context)
+        {
+            _context = context;
+        }
+
+        public void Generate()
+        {
+            foreach (var controller in _context.Avatar.Controllers) GenerateController(controller);
+        }
+
+        private void GenerateController(PlayableController controller)
+        {
+            var controllers = _context.Services.ControllerContext;
+            var target = VirtualAnimatorController.Create(controllers.CloneContext, $"Declavatar {controller.Playable}");
+            target.Parameters = controller.Parameters.ToImmutableDictionary(parameter => parameter.Name, Convert);
+            var assets = new CloneContext(controllers.PlatformBindings);
+            var mask = controller.Mask is AssetIndex maskIndex ? assets.Clone(_context.Resolver.Asset<AvatarMask>(maskIndex)) : null;
+            var motions = new MotionGenerator(_context, controller.PathMode, assets);
+            var behaviors = new BehaviorGenerator(_context);
+            foreach (var layer in controller.Layers)
+            {
+                target.AddLayer(LayerPriority.Default, GenerateLayer(layer, motions, behaviors, mask));
+            }
+            new AnimationIndex(new[] { target }).RewritePaths(path => _context.VirtualPath(controller.PathMode, path));
+
+            var merge = _context.Declaration.gameObject.AddComponent<ModularAvatarMergeAnimator>();
+            merge.animator = new UnityController { name = target.Name };
+            merge.layerType = LayerTypeOf(controller.Playable);
+            merge.mergeAnimatorMode = controller.Mode == MergeMode.Replace ? MergeAnimatorMode.Replace : MergeAnimatorMode.Append;
+            merge.layerPriority = controller.Priority;
+            merge.pathMode = MergeAnimatorPathMode.Absolute;
+            merge.relativePathRoot.Set(_context.RelativeRoot);
+            merge.matchAvatarWriteDefaults = _context.Declaration.MatchAvatarWriteDefaults;
+            merge.deleteAttachedAnimator = false;
+            controllers.Controllers[merge] = target;
+        }
+
+        private VirtualLayer GenerateLayer(AnimatorLayer layer, MotionGenerator motions, BehaviorGenerator behaviors, VirtualAvatarMask mask)
+        {
+            var clone = _context.Services.ControllerContext.CloneContext;
+            var machine = VirtualStateMachine.Create(clone, layer.Name);
+            var result = VirtualLayer.Create(clone, layer.Name);
+            result.StateMachine = machine;
+            result.DefaultWeight = 1f;
+            result.AvatarMask = mask;
+
+            var states = new VirtualState[layer.States.Count];
+            for (var i = 0; i < states.Length; i++)
+            {
+                var source = layer.States[i];
+                var motion = motions.Generate(source.Motion, $"{layer.Name}/{source.Name}");
+                var state = machine.AddState(source.Name, motion, PositionOf(i));
+                state.Speed = (float)source.Speed;
+                state.SpeedParameter = source.SpeedBy;
+                state.TimeParameter = source.TimeBy;
+                state.WriteDefaultValues = source.WriteDefaults;
+                state.Behaviours = behaviors.Generate(source.Behaviors);
+                states[i] = state;
+            }
+            if (layer.DefaultState is int defaultState) machine.DefaultState = states[defaultState];
+            foreach (var transition in layer.Transitions) AddTransition(machine, states, transition);
+
+            return result;
+        }
+
+        private static void AddTransition(VirtualStateMachine machine, VirtualState[] states, AnimatorTransition transition)
+        {
+            var conditions = transition.Conditions.Select(Convert).ToImmutableList();
+            if (transition.From.IsEntry)
+            {
+                var entry = VirtualTransition.Create();
+                SetDestination(entry, states, transition.To);
+                entry.Conditions = conditions;
+                machine.EntryTransitions = machine.EntryTransitions.Add(entry);
+                return;
+            }
+
+            var from = states[transition.From.StateIndex.Value];
+            var result = VirtualStateTransition.Create();
+            result.ExitTime = null;
+            result.Duration = (float)transition.Duration;
+            result.HasFixedDuration = true;
+            result.CanTransitionToSelf = false;
+            result.InterruptionSource = UnityEditor.Animations.TransitionInterruptionSource.None;
+            SetDestination(result, states, transition.To);
+            result.Conditions = conditions;
+            from.Transitions = from.Transitions.Add(result);
+        }
+
+        private static void SetDestination(VirtualTransitionBase transition, VirtualState[] states, TransitionTarget target)
+        {
+            if (target.IsExit) transition.SetExitDestination();
+            else transition.SetDestination(states[target.StateIndex.Value]);
+        }
+
+        private static UnityCondition Convert(AnimatorCondition condition)
+        {
+            switch (condition)
+            {
+                case AnimatorCondition.If _: return Condition(UnityConditionMode.If, condition.Parameter, 0f);
+                case AnimatorCondition.IfNot _: return Condition(UnityConditionMode.IfNot, condition.Parameter, 0f);
+                case AnimatorCondition.Equal equal: return Condition(UnityConditionMode.Equals, condition.Parameter, equal.Value);
+                case AnimatorCondition.NotEqual notEqual: return Condition(UnityConditionMode.NotEqual, condition.Parameter, notEqual.Value);
+                case AnimatorCondition.Greater greater: return Condition(UnityConditionMode.Greater, condition.Parameter, (float)greater.Value);
+                case AnimatorCondition.Less less: return Condition(UnityConditionMode.Less, condition.Parameter, (float)less.Value);
+                default: throw new InvalidOperationException($"unknown condition {condition}");
+            }
+        }
+
+        private static UnityCondition Condition(UnityConditionMode mode, string parameter, float threshold)
+        {
+            return new UnityCondition { mode = mode, parameter = parameter, threshold = threshold };
+        }
+
+        private static AnimatorControllerParameter Convert(AnimatorParameter parameter)
+        {
+            var result = new AnimatorControllerParameter { name = parameter.Name };
+            switch (parameter.Kind)
+            {
+                case AnimatorParameterKind.Bool b:
+                    result.type = AnimatorControllerParameterType.Bool;
+                    result.defaultBool = b.Default ?? false;
+                    break;
+                case AnimatorParameterKind.Int i:
+                    result.type = AnimatorControllerParameterType.Int;
+                    result.defaultInt = i.Default ?? 0;
+                    break;
+                case AnimatorParameterKind.Float f:
+                    result.type = AnimatorControllerParameterType.Float;
+                    result.defaultFloat = f.Default ?? 0f;
+                    break;
+            }
+            return result;
+        }
+
+        private static Vector3 PositionOf(int index)
+        {
+            return new Vector3(300f * (index % 4), 80f * (index / 4) + 80f, 0f);
+        }
+
+        private static VRCAvatarDescriptor.AnimLayerType LayerTypeOf(PlayableLayer playable)
+        {
+            switch (playable)
+            {
+                case PlayableLayer.Base: return VRCAvatarDescriptor.AnimLayerType.Base;
+                case PlayableLayer.Additive: return VRCAvatarDescriptor.AnimLayerType.Additive;
+                case PlayableLayer.Gesture: return VRCAvatarDescriptor.AnimLayerType.Gesture;
+                case PlayableLayer.Action: return VRCAvatarDescriptor.AnimLayerType.Action;
+                case PlayableLayer.Fx: return VRCAvatarDescriptor.AnimLayerType.FX;
+                case PlayableLayer.Sitting: return VRCAvatarDescriptor.AnimLayerType.Sitting;
+                case PlayableLayer.TPose: return VRCAvatarDescriptor.AnimLayerType.TPose;
+                case PlayableLayer.IkPose: return VRCAvatarDescriptor.AnimLayerType.IKPose;
+                default: throw new ArgumentOutOfRangeException(nameof(playable), playable, null);
+            }
+        }
+    }
+}

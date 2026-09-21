@@ -1,0 +1,51 @@
+msgid ""
+msgstr ""
+"Language: ja-JP\n"
+
+msgid "declavatar2.declaration.no_script"
+msgstr "Declavatar Declaration にスクリプトが設定されていません"
+
+msgid "declavatar2.native.failed"
+msgstr "declavatar2 のネイティブライブラリが宣言をコンパイルできませんでした: {0}"
+
+msgid "declavatar2.compile.script"
+msgstr "Lua エラー: {0}"
+
+msgid "declavatar2.compile.transform"
+msgstr "宣言エラー ({0}): {1}"
+
+msgid "declavatar2.resolve.object"
+msgstr "オブジェクト `{0}` が `{1}` 以下に見つかりません ({2} パス、参照元 {3})"
+
+msgid "declavatar2.resolve.component_type"
+msgstr "コンポーネント型 `{0}` が見つかりません (参照元 {1})"
+
+msgid "declavatar2.resolve.asset_type_unknown"
+msgstr "`{1}` のアセット型 `{0}` が見つかりません (参照元 {2})"
+
+msgid "declavatar2.resolve.asset_not_found"
+msgstr "アセット {0} が見つかりません (参照元 {1})"
+
+msgid "declavatar2.resolve.asset_ambiguous"
+msgstr "アセット {0} に {1} 件が該当します。Asset Dictionary に登録してください (参照元 {2})"
+
+msgid "declavatar2.resolve.asset_type_mismatch"
+msgstr "アセット {0} は {1} ですが {2} が必要です (参照元 {3})"
+
+msgid "declavatar2.generate.width"
+msgstr "パラメータ `{0}` のビット幅 {1} は使えません。VRChat の Expression Parameter は 8 ビットです"
+
+msgid "declavatar2.generate.renderer_type"
+msgstr "レンダラー型 `{0}` が見つかりません"
+
+msgid "declavatar2.generate.blend_shape"
+msgstr "`{0}` のスキンドメッシュにフレームを持つ BlendShape `{1}` が見つかりません"
+
+msgid "declavatar2.generate.behaviour_type"
+msgstr "State Behaviour 型 `{0}` が見つかりません"
+
+msgid "declavatar2.generate.behaviour_field"
+msgstr "State Behaviour `{0}` にフィールド `{1}` がありません"
+
+msgid "declavatar2.generate.behaviour_value"
+msgstr "State Behaviour `{0}` のフィールド `{1}` に {2} は設定できません"

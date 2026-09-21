@@ -52,3 +52,78 @@ msgstr "State behaviour `{0}` has no field `{1}`"
 
 msgid "declavatar2.generate.behaviour_value"
 msgstr "Field `{1}` of state behaviour `{0}` cannot take {2}"
+
+msgid "declavatar2.inspector.script"
+msgstr "Script"
+
+msgid "declavatar2.inspector.script:tooltip"
+msgstr "The Lua script that declares this avatar"
+
+msgid "declavatar2.inspector.symbols"
+msgstr "Symbols"
+
+msgid "declavatar2.inspector.symbols:tooltip"
+msgstr "Symbols passed to the script for conditional declaration"
+
+msgid "declavatar2.inspector.module-roots"
+msgstr "Module Roots"
+
+msgid "declavatar2.inspector.module-roots:tooltip"
+msgstr "Folders searched for Lua modules required by the script"
+
+msgid "declavatar2.inspector.asset-dictionaries"
+msgstr "Asset Dictionaries"
+
+msgid "declavatar2.inspector.asset-dictionaries:tooltip"
+msgstr "Dictionaries consulted when the script refers to an asset by name"
+
+msgid "declavatar2.inspector.match-write-defaults"
+msgstr "Match Avatar Write Defaults"
+
+msgid "declavatar2.inspector.recompile"
+msgstr "Recompile"
+
+msgid "declavatar2.inspector.externs"
+msgstr "Externals"
+
+msgid "declavatar2.inspector.relative-path-root"
+msgstr "Relative Path Root"
+
+msgid "declavatar2.inspector.relative-path-root:tooltip"
+msgstr "Root object for relative object paths; defaults to this object"
+
+msgid "declavatar2.inspector.extern-assets"
+msgstr "Assets"
+
+msgid "declavatar2.inspector.extern-objects"
+msgstr "Object Paths"
+
+msgid "declavatar2.inspector.extern-components"
+msgstr "Component Types"
+
+msgid "declavatar2.inspector.extern-object-root"
+msgstr "(root)"
+
+msgid "declavatar2.inspector.extern-auto"
+msgstr "auto"
+
+msgid "declavatar2.inspector.extern-overridden"
+msgstr "overridden"
+
+msgid "declavatar2.inspector.extern-unresolved"
+msgstr "unresolved"
+
+msgid "declavatar2.inspector.status-no-script"
+msgstr "Assign a script to compile the declaration."
+
+msgid "declavatar2.inspector.status-failed"
+msgstr "{0} error ({1})"
+
+msgid "declavatar2.inspector.status-compiled"
+msgstr "Compiled: {0} expression parameters, {1} controllers ({2} layers), {3} menu items"
+
+msgid "declavatar2.inspector.stage-script"
+msgstr "Script"
+
+msgid "declavatar2.inspector.stage-transform"
+msgstr "Declaration"

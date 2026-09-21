@@ -13,6 +13,13 @@
         "email": "kb10uy@kb10uy.org",
         "url": "https://kb10uy.org"
     },
+    "samples": [
+        {
+            "displayName": "Sample Declaration",
+            "description": "An example declaration script covering parameters, group/switch/puppet layers, menu items and externals.",
+            "path": "Samples~/Declaration"
+        }
+    ],
     "vpmDependencies": {
         "com.vrchat.avatars" : ">=3.10.0",
         "nadena.dev.ndmf": ">=1.14.0",

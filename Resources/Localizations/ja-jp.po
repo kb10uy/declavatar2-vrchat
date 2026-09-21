@@ -52,3 +52,78 @@ msgstr "State Behaviour `{0}` にフィールド `{1}` がありません"
 
 msgid "declavatar2.generate.behaviour_value"
 msgstr "State Behaviour `{0}` のフィールド `{1}` に {2} は設定できません"
+
+msgid "declavatar2.inspector.script"
+msgstr "スクリプト"
+
+msgid "declavatar2.inspector.script:tooltip"
+msgstr "このアバターを宣言する Lua スクリプト"
+
+msgid "declavatar2.inspector.symbols"
+msgstr "シンボル"
+
+msgid "declavatar2.inspector.symbols:tooltip"
+msgstr "条件付き宣言のためにスクリプトへ渡すシンボル"
+
+msgid "declavatar2.inspector.module-roots"
+msgstr "モジュールルート"
+
+msgid "declavatar2.inspector.module-roots:tooltip"
+msgstr "スクリプトが require する Lua モジュールを探索するフォルダ"
+
+msgid "declavatar2.inspector.asset-dictionaries"
+msgstr "Asset Dictionary"
+
+msgid "declavatar2.inspector.asset-dictionaries:tooltip"
+msgstr "スクリプトが名前でアセットを参照したときに参照される辞書"
+
+msgid "declavatar2.inspector.match-write-defaults"
+msgstr "アバターの Write Defaults に合わせる"
+
+msgid "declavatar2.inspector.recompile"
+msgstr "再コンパイル"
+
+msgid "declavatar2.inspector.externs"
+msgstr "外部参照"
+
+msgid "declavatar2.inspector.relative-path-root"
+msgstr "相対パスのルート"
+
+msgid "declavatar2.inspector.relative-path-root:tooltip"
+msgstr "相対オブジェクトパスの基準。未設定ならこのオブジェクト"
+
+msgid "declavatar2.inspector.extern-assets"
+msgstr "アセット"
+
+msgid "declavatar2.inspector.extern-objects"
+msgstr "オブジェクトパス"
+
+msgid "declavatar2.inspector.extern-components"
+msgstr "コンポーネント型"
+
+msgid "declavatar2.inspector.extern-object-root"
+msgstr "(ルート)"
+
+msgid "declavatar2.inspector.extern-auto"
+msgstr "自動解決"
+
+msgid "declavatar2.inspector.extern-overridden"
+msgstr "手動指定"
+
+msgid "declavatar2.inspector.extern-unresolved"
+msgstr "未解決"
+
+msgid "declavatar2.inspector.status-no-script"
+msgstr "スクリプトを設定するとコンパイルされます。"
+
+msgid "declavatar2.inspector.status-failed"
+msgstr "{0}エラー ({1} 件)"
+
+msgid "declavatar2.inspector.status-compiled"
+msgstr "コンパイル成功: Expression Parameter {0} 個、コントローラー {1} 個 (レイヤー {2} 個)、メニュー項目 {3} 個"
+
+msgid "declavatar2.inspector.stage-script"
+msgstr "スクリプト"
+
+msgid "declavatar2.inspector.stage-transform"
+msgstr "宣言"

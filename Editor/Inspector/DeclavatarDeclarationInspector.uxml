@@ -1,0 +1,36 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <uie:ObjectField label="declavatar2.inspector.script" type="UnityEngine.TextAsset, UnityEngine.CoreModule" binding-path="Script" name="FieldScript" allow-scene-objects="false" class="ndmf-tr" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:Label tabindex="-1" text="declavatar2.inspector.symbols" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" />
+        <ui:ListView name="FieldSymbols" binding-path="Symbols" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-bound-collection-size="false" />
+    </ui:VisualElement>
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:Label tabindex="-1" text="declavatar2.inspector.module-roots" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" />
+        <ui:ListView name="FieldModuleRoots" binding-path="ModuleRoots" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-bound-collection-size="false" />
+    </ui:VisualElement>
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:Label tabindex="-1" text="declavatar2.inspector.asset-dictionaries" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" />
+        <ui:ListView name="FieldAssetDictionaries" binding-path="AssetDictionaries" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-bound-collection-size="false" />
+    </ui:VisualElement>
+    <ui:Toggle label="declavatar2.inspector.match-write-defaults" binding-path="MatchAvatarWriteDefaults" name="FieldMatchWriteDefaults" class="ndmf-tr" />
+    <ui:VisualElement style="flex-direction: row; justify-content: flex-end; margin-top: 4px; margin-bottom: 4px;">
+        <ui:Button text="declavatar2.inspector.recompile" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonRecompile" class="ndmf-tr" />
+    </ui:VisualElement>
+    <ui:HelpBox name="BoxStatus" message-type="Info" />
+    <ui:VisualElement name="ContainerDiagnostics" style="margin-left: 4px; margin-top: 2px;" />
+    <ui:Foldout text="declavatar2.inspector.externs" name="FoldoutExterns" value="true" class="ndmf-tr" style="margin-top: 4px;">
+        <uie:ObjectField label="declavatar2.inspector.relative-path-root" type="UnityEngine.GameObject, UnityEngine.CoreModule" binding-path="RelativePathRoot" name="FieldRelativePathRoot" allow-scene-objects="true" class="ndmf-tr" />
+        <ui:VisualElement name="SectionAssetExterns">
+            <ui:Label tabindex="-1" text="declavatar2.inspector.extern-assets" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold; margin-top: 4px;" />
+            <ui:VisualElement name="ContainerAssetExterns" />
+        </ui:VisualElement>
+        <ui:VisualElement name="SectionObjectExterns">
+            <ui:Label tabindex="-1" text="declavatar2.inspector.extern-objects" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold; margin-top: 4px;" />
+            <ui:VisualElement name="ContainerObjectExterns" />
+        </ui:VisualElement>
+        <ui:VisualElement name="SectionComponentExterns">
+            <ui:Label tabindex="-1" text="declavatar2.inspector.extern-components" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" style="-unity-font-style: bold; margin-top: 4px;" />
+            <ui:VisualElement name="ContainerComponentExterns" />
+        </ui:VisualElement>
+    </ui:Foldout>
+</ui:UXML>

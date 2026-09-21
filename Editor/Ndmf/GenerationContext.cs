@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using KusakaFactory.Declavatar2.Data;
 using KusakaFactory.Declavatar2.Resolution;
@@ -23,7 +22,7 @@ namespace KusakaFactory.Declavatar2.Ndmf
                 avatar.Externals,
                 build.AvatarRootObject,
                 RelativeRoot,
-                (declaration.AssetDictionaries ?? Array.Empty<DeclavatarAssetDictionary>()).Where(d => d != null).ToArray()
+                DeclarationAssets.Entries(declaration)
             );
         }
 

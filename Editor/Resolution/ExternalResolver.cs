@@ -17,13 +17,13 @@ namespace KusakaFactory.Declavatar2.Resolution
         private readonly HashSet<(int, Type)> _reportedMismatches = new HashSet<(int, Type)>();
         private readonly List<ResolutionError> _errors = new List<ResolutionError>();
 
-        public ExternalResolver(Externals externals, GameObject absoluteRoot, GameObject relativeRoot, IReadOnlyList<DeclavatarAssetDictionary> dictionaries)
+        public ExternalResolver(Externals externals, GameObject absoluteRoot, GameObject relativeRoot, IReadOnlyList<DeclavatarAssetDictionary.Entry> assetEntries)
         {
             _externals = externals;
             AbsoluteRoot = absoluteRoot;
             RelativeRoot = relativeRoot;
             _componentTypes = externals.ComponentTypes.Select(ResolveComponentType).ToArray();
-            _assets = externals.Assets.Select(entry => ResolveAsset(entry, dictionaries)).ToArray();
+            _assets = externals.Assets.Select(entry => ResolveAsset(entry, assetEntries)).ToArray();
         }
 
         public GameObject AbsoluteRoot { get; }
@@ -77,7 +77,7 @@ namespace KusakaFactory.Declavatar2.Resolution
             return type;
         }
 
-        private UnityEngine.Object ResolveAsset(ExternEntry<AssetLocator> entry, IReadOnlyList<DeclavatarAssetDictionary> dictionaries)
+        private UnityEngine.Object ResolveAsset(ExternEntry<AssetLocator> entry, IReadOnlyList<DeclavatarAssetDictionary.Entry> assetEntries)
         {
             switch (entry.Value)
             {
@@ -95,13 +95,13 @@ namespace KusakaFactory.Declavatar2.Resolution
                     return asset;
                 }
                 case AssetLocator.Named named:
-                    return ResolveNamed(entry, named, dictionaries);
+                    return ResolveNamed(entry, named, assetEntries);
                 default:
                     throw new InvalidOperationException($"unknown asset locator {entry.Value}");
             }
         }
 
-        private UnityEngine.Object ResolveNamed(ExternEntry<AssetLocator> entry, AssetLocator.Named named, IReadOnlyList<DeclavatarAssetDictionary> dictionaries)
+        private UnityEngine.Object ResolveNamed(ExternEntry<AssetLocator> entry, AssetLocator.Named named, IReadOnlyList<DeclavatarAssetDictionary.Entry> assetEntries)
         {
             var type = TypeIndex.FindObject(named.AssetType);
             if (type == null)
@@ -110,13 +110,9 @@ namespace KusakaFactory.Declavatar2.Resolution
                 return null;
             }
 
-            foreach (var dictionary in dictionaries)
+            foreach (var candidate in assetEntries)
             {
-                if (dictionary == null || dictionary.Entries == null) continue;
-                foreach (var candidate in dictionary.Entries)
-                {
-                    if (candidate.Name == named.Name && candidate.Asset != null && type.IsInstanceOfType(candidate.Asset)) return candidate.Asset;
-                }
+                if (candidate.Name == named.Name && candidate.Asset != null && type.IsInstanceOfType(candidate.Asset)) return candidate.Asset;
             }
 
             var found = new List<UnityEngine.Object>();

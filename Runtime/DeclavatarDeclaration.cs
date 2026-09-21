@@ -10,6 +10,7 @@ namespace KusakaFactory.Declavatar2.Runtime
         public string[] Symbols = new string[0];
         public Object[] ModuleRoots = new Object[0];
         public DeclavatarAssetDictionary[] AssetDictionaries = new DeclavatarAssetDictionary[0];
+        public DeclavatarAssetDictionary.Entry[] AssetOverrides = new DeclavatarAssetDictionary.Entry[0];
         public GameObject RelativePathRoot;
         public bool MatchAvatarWriteDefaults;
     }

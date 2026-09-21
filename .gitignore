@@ -1,2 +1,5 @@
 /.vscode
 /sync.ps1
+/Plugins/*.dll
+/Plugins/*.dylib
+/Plugins/*.so

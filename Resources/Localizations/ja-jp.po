@@ -83,9 +83,6 @@ msgstr "アバターの Write Defaults に合わせる"
 msgid "declavatar2.inspector.recompile"
 msgstr "再コンパイル"
 
-msgid "declavatar2.inspector.externs"
-msgstr "外部参照"
-
 msgid "declavatar2.inspector.relative-path-root"
 msgstr "相対パスのルート"
 
@@ -93,16 +90,7 @@ msgid "declavatar2.inspector.relative-path-root:tooltip"
 msgstr "相対オブジェクトパスの基準。未設定ならこのオブジェクト"
 
 msgid "declavatar2.inspector.extern-assets"
-msgstr "アセット"
-
-msgid "declavatar2.inspector.extern-objects"
-msgstr "オブジェクトパス"
-
-msgid "declavatar2.inspector.extern-components"
-msgstr "コンポーネント型"
-
-msgid "declavatar2.inspector.extern-object-root"
-msgstr "(ルート)"
+msgstr "外部参照アセット"
 
 msgid "declavatar2.inspector.extern-auto"
 msgstr "自動解決"

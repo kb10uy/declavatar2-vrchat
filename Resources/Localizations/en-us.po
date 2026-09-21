@@ -83,9 +83,6 @@ msgstr "Match Avatar Write Defaults"
 msgid "declavatar2.inspector.recompile"
 msgstr "Recompile"
 
-msgid "declavatar2.inspector.externs"
-msgstr "Externals"
-
 msgid "declavatar2.inspector.relative-path-root"
 msgstr "Relative Path Root"
 
@@ -93,16 +90,7 @@ msgid "declavatar2.inspector.relative-path-root:tooltip"
 msgstr "Root object for relative object paths; defaults to this object"
 
 msgid "declavatar2.inspector.extern-assets"
-msgstr "Assets"
-
-msgid "declavatar2.inspector.extern-objects"
-msgstr "Object Paths"
-
-msgid "declavatar2.inspector.extern-components"
-msgstr "Component Types"
-
-msgid "declavatar2.inspector.extern-object-root"
-msgstr "(root)"
+msgstr "External Assets"
 
 msgid "declavatar2.inspector.extern-auto"
 msgstr "auto"

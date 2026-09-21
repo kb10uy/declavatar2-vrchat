@@ -1,19 +1,19 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <uie:ObjectField label="declavatar2.inspector.script" type="UnityEngine.TextAsset, UnityEngine.CoreModule" binding-path="Script" name="FieldScript" allow-scene-objects="false" class="ndmf-tr" />
-    <ui:VisualElement style="flex-grow: 1;">
+    <uie:ObjectField label="declavatar2.inspector.script" type="UnityEngine.TextAsset, UnityEngine.CoreModule" binding-path="Script" name="FieldScript" allow-scene-objects="false" class="ndmf-tr" style="margin-right: 2px; margin-bottom: 10px;" />
+    <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; margin-left: 4px; margin-bottom: 4px;">
         <ui:Label tabindex="-1" text="declavatar2.inspector.symbols" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" />
-        <ui:ListView name="FieldSymbols" binding-path="Symbols" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-bound-collection-size="false" />
+        <ui:ListView name="FieldSymbols" binding-path="Symbols" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-bound-collection-size="false" show-border="true" />
     </ui:VisualElement>
-    <ui:VisualElement style="flex-grow: 1;">
+    <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; margin-left: 4px; margin-bottom: 4px;">
         <ui:Label tabindex="-1" text="declavatar2.inspector.module-roots" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" />
-        <ui:ListView name="FieldModuleRoots" binding-path="ModuleRoots" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-bound-collection-size="false" />
+        <ui:ListView name="FieldModuleRoots" binding-path="ModuleRoots" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-bound-collection-size="false" show-border="true" />
     </ui:VisualElement>
-    <ui:VisualElement style="flex-grow: 1;">
+    <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; margin-left: 4px; margin-bottom: 4px;">
         <ui:Label tabindex="-1" text="declavatar2.inspector.asset-dictionaries" parse-escape-sequences="true" display-tooltip-when-elided="true" class="ndmf-tr" />
-        <ui:ListView name="FieldAssetDictionaries" binding-path="AssetDictionaries" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-bound-collection-size="false" />
+        <ui:ListView name="FieldAssetDictionaries" binding-path="AssetDictionaries" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-bound-collection-size="false" show-border="true" />
     </ui:VisualElement>
     <ui:Toggle label="declavatar2.inspector.match-write-defaults" binding-path="MatchAvatarWriteDefaults" name="FieldMatchWriteDefaults" class="ndmf-tr" />
-    <ui:VisualElement style="flex-direction: row; justify-content: flex-end; margin-top: 4px; margin-bottom: 4px;">
+    <ui:VisualElement style="flex-direction: row; justify-content: flex-end; margin-top: 4px; margin-bottom: 4px; flex-shrink: 0;">
         <ui:Button text="declavatar2.inspector.recompile" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonRecompile" class="ndmf-tr" />
     </ui:VisualElement>
     <ui:HelpBox name="BoxStatus" message-type="Info" />

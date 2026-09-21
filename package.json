@@ -1,0 +1,23 @@
+{
+    "name": "org.kb10uy.declavatar2",
+    "displayName": "Declavatar 2",
+    "version": "1.0.0",
+    "unity": "2022.3",
+    "description": "Declarative Avatar Asset Composing Tool; Revised",
+    "documentationUrl": "https://declavatar2.kb10uy.dev",
+    "license": "Apache-2.0 OR MIT",
+    "licenseUrl": "https://github.com/kb10uy/declavatar2-vrchat/blob/main/LICENSE",
+    "vrchatVersion": "2022.1.1",
+    "author": {
+        "name": "kb10uy",
+        "email": "kb10uy@kb10uy.org",
+        "url": "https://kb10uy.org"
+    },
+    "vpmDependencies": {
+        "com.vrchat.avatars" : ">=3.10.0",
+        "nadena.dev.ndmf": ">=1.14.0",
+        "nadena.dev.modular-avatar": ">=1.18.0"
+    },
+    "dependencies": {
+    }
+}

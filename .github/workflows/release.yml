@@ -2,6 +2,11 @@ name: "Build unitypackage"
 
 on:
   workflow_dispatch:
+    inputs:
+      da2-version:
+        description: "Tag of the kb10uy/declavatar2 release to bundle the native library from"
+        required: true
+        type: "string"
 
 permissions:
   contents: write
@@ -15,6 +20,55 @@ jobs:
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v4"
+
+      - name: "Fetch Native Library"
+        shell: "bash"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DA2_VERSION: ${{ inputs.da2-version }}
+        run: |
+          gh release download "$DA2_VERSION" -R kb10uy/declavatar2 -D "$RUNNER_TEMP/da2"
+          cp "$RUNNER_TEMP/da2/da2-x86_64-pc-windows-msvc.dll" ./Plugins/da2.dll
+          cp "$RUNNER_TEMP/da2/libda2-x86_64-unknown-linux-gnu.so" ./Plugins/libda2.so
+          cp "$RUNNER_TEMP/da2/libda2-universal-apple-darwin.dylib" ./Plugins/libda2.dylib
+
+      - name: "Check Format Versions"
+        shell: "bash"
+        run: |
+          python3 - <<'EOF'
+          import ctypes
+          import re
+          import sys
+
+          class FormatVersions(ctypes.Structure):
+              _fields_ = [
+                  ("schema", ctypes.c_uint16),
+                  ("avatar_data", ctypes.c_uint16),
+                  ("diagnostics_data", ctypes.c_uint16),
+              ]
+
+          library = ctypes.CDLL("./Plugins/libda2.so")
+          library.da2_format_versions.restype = FormatVersions
+          versions = library.da2_format_versions()
+          native = {
+              "Schema": versions.schema,
+              "AvatarData": versions.avatar_data,
+              "DiagnosticsData": versions.diagnostics_data,
+          }
+
+          with open("./Editor/Data/BlobHeader.cs", encoding="utf-8") as f:
+              source = f.read()
+          client = {
+              name: int(re.search(rf"const ushort {name}Version = (\d+);", source).group(1))
+              for name in native
+          }
+
+          print(f"native: {native}")
+          print(f"client: {client}")
+          if native != client:
+              print("::error::the native library and the client disagree on the interop format versions")
+              sys.exit(1)
+          EOF
 
       - name: "Build"
         id: "build"
@@ -38,6 +92,7 @@ jobs:
         with:
           tag_name: ${{ steps.build.outputs.package-version }}
           prerelease: ${{ steps.release.outputs.prerelease }}
+          body: "Native library: kb10uy/declavatar2 ${{ inputs.da2-version }}"
           files: |
             ${{ steps.build.outputs.zip-path }}
             ${{ steps.build.outputs.unitypackage-path }}

@@ -14,6 +14,17 @@ namespace KusakaFactory.Declavatar2.Data
         IkPose = 7,
     }
 
+    public static class PlayableLayerExtensions
+    {
+        public static bool IsBlendable(this PlayableLayer playable)
+        {
+            return playable == PlayableLayer.Action
+                || playable == PlayableLayer.Fx
+                || playable == PlayableLayer.Gesture
+                || playable == PlayableLayer.Additive;
+        }
+    }
+
     public enum MergeMode : byte
     {
         Append = 0,

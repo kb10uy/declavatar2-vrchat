@@ -45,6 +45,37 @@ namespace KusakaFactory.Declavatar2.Data
             public ComponentTypeIndex Type { get; }
             public IReadOnlyDictionary<string, GenericValue> Fields { get; }
         }
+
+        public sealed class LayerControl : Behavior
+        {
+            public LayerControl(LayerRef layer, double goalWeight, double blendDuration)
+            {
+                Layer = layer;
+                GoalWeight = goalWeight;
+                BlendDuration = blendDuration;
+            }
+
+            public LayerRef Layer { get; }
+            public double GoalWeight { get; }
+            public double BlendDuration { get; }
+        }
+    }
+
+    public readonly struct LayerRef
+    {
+        public LayerRef(int controller, int layer)
+        {
+            Controller = controller;
+            Layer = layer;
+        }
+
+        public int Controller { get; }
+        public int Layer { get; }
+
+        public override string ToString()
+        {
+            return $"layer {Layer} of controller {Controller}";
+        }
     }
 
     public abstract class ParameterDriveTarget

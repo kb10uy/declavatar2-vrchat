@@ -13,10 +13,14 @@ namespace KusakaFactory.Declavatar2.Ndmf
     internal sealed class BehaviorGenerator
     {
         private readonly GenerationContext _context;
+        private readonly PlayableController _controller;
+        private readonly List<(VRCAnimatorLayerControl, LayerRef)> _layerControls;
 
-        public BehaviorGenerator(GenerationContext context)
+        public BehaviorGenerator(GenerationContext context, PlayableController controller, List<(VRCAnimatorLayerControl, LayerRef)> layerControls)
         {
             _context = context;
+            _controller = controller;
+            _layerControls = layerControls;
         }
 
         public ImmutableList<StateMachineBehaviour> Generate(IReadOnlyList<Behavior> behaviors)
@@ -42,6 +46,9 @@ namespace KusakaFactory.Declavatar2.Ndmf
                     case Behavior.Generic generic:
                         var created = Convert(generic);
                         if (created != null) result.Add(created);
+                        break;
+                    case Behavior.LayerControl layerControl:
+                        result.Add(Convert(layerControl));
                         break;
                     default:
                         throw new InvalidOperationException($"unknown behavior {behavior}");
@@ -139,6 +146,28 @@ namespace KusakaFactory.Declavatar2.Ndmf
                 case TrackingControlMode.Tracking: return VRC_AnimatorTrackingControl.TrackingType.Tracking;
                 case TrackingControlMode.Animation: return VRC_AnimatorTrackingControl.TrackingType.Animation;
                 default: throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
+            }
+        }
+
+        private VRCAnimatorLayerControl Convert(Behavior.LayerControl layerControl)
+        {
+            var control = ScriptableObject.CreateInstance<VRCAnimatorLayerControl>();
+            control.playable = BlendableLayerOf(_controller.Playable);
+            control.goalWeight = (float)layerControl.GoalWeight;
+            control.blendDuration = (float)layerControl.BlendDuration;
+            _layerControls.Add((control, layerControl.Layer));
+            return control;
+        }
+
+        private static VRC_AnimatorLayerControl.BlendableLayer BlendableLayerOf(PlayableLayer playable)
+        {
+            switch (playable)
+            {
+                case PlayableLayer.Action: return VRC_AnimatorLayerControl.BlendableLayer.Action;
+                case PlayableLayer.Fx: return VRC_AnimatorLayerControl.BlendableLayer.FX;
+                case PlayableLayer.Gesture: return VRC_AnimatorLayerControl.BlendableLayer.Gesture;
+                case PlayableLayer.Additive: return VRC_AnimatorLayerControl.BlendableLayer.Additive;
+                default: throw new ArgumentOutOfRangeException(nameof(playable), playable, null);
             }
         }
 

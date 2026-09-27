@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace KusakaFactory.Declavatar2.Data
 {
@@ -32,9 +33,42 @@ namespace KusakaFactory.Declavatar2.Data
             }
             reader.Parameters = scope;
             var menu = reader.ReadList(ReadMenuItem);
+            CheckLayerControls(controllers);
 
             var externals = new Externals(objectPaths, componentTypes, reader.ComponentTypeUsages, assets, needsRelativeRoot);
             return new Avatar(externals, expressionParameters, controllers, menu);
+        }
+
+        private static void CheckLayerControls(IReadOnlyList<PlayableController> controllers)
+        {
+            foreach (var holder in controllers)
+            {
+                var controls = holder.Layers
+                    .SelectMany(layer => layer.States)
+                    .SelectMany(state => state.Behaviors)
+                    .OfType<Behavior.LayerControl>();
+                foreach (var control in controls)
+                {
+                    if (!holder.Playable.IsBlendable())
+                    {
+                        throw new BlobDecodeException($"a layer control is held by a {holder.Playable} controller, whose layers cannot be controlled");
+                    }
+                    var reference = control.Layer;
+                    if (reference.Controller >= controllers.Count)
+                    {
+                        throw new BlobDecodeException($"controller index {reference.Controller} is out of range for an avatar of {controllers.Count} controllers");
+                    }
+                    var target = controllers[reference.Controller];
+                    if (target.Playable != holder.Playable)
+                    {
+                        throw new BlobDecodeException($"a layer control in a {holder.Playable} controller refers to controller {reference.Controller}, which is {target.Playable}");
+                    }
+                    if (reference.Layer >= target.Layers.Count)
+                    {
+                        throw new BlobDecodeException($"layer index {reference.Layer} is out of range for controller {reference.Controller} of {target.Layers.Count} layers");
+                    }
+                }
+            }
         }
 
         private static byte ReadDiscriminator(BlobReader reader, string typeName, int variantCount)
@@ -630,6 +664,14 @@ namespace KusakaFactory.Declavatar2.Data
                     var type = ReadComponentType(reader, ComponentTypeUsage.StateBehaviour);
                     var fields = reader.ReadMap(ReadGenericValue);
                     return new Behavior.Generic(type, fields);
+                }
+                case 3:
+                {
+                    var controller = reader.ReadLength("controller index");
+                    var layer = reader.ReadLength("layer index");
+                    var goalWeight = reader.ReadF64();
+                    var blendDuration = reader.ReadF64();
+                    return new Behavior.LayerControl(new LayerRef(controller, layer), goalWeight, blendDuration);
                 }
                 default:
                     throw reader.InvalidDiscriminator("Behavior", tag);

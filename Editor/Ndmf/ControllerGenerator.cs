@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using KusakaFactory.Declavatar2.Data;
@@ -26,10 +27,13 @@ namespace KusakaFactory.Declavatar2.Ndmf
 
         public void Generate()
         {
-            foreach (var controller in _context.Avatar.Controllers) GenerateController(controller);
+            var layers = new List<VirtualLayer[]>();
+            var layerControls = new List<(VRCAnimatorLayerControl Control, LayerRef Layer)>();
+            foreach (var controller in _context.Avatar.Controllers) layers.Add(GenerateController(controller, layerControls));
+            foreach (var (control, layer) in layerControls) control.layer = layers[layer.Controller][layer.Layer].VirtualLayerIndex;
         }
 
-        private void GenerateController(PlayableController controller)
+        private VirtualLayer[] GenerateController(PlayableController controller, List<(VRCAnimatorLayerControl, LayerRef)> layerControls)
         {
             var controllers = _context.Services.ControllerContext;
             var target = VirtualAnimatorController.Create(controllers.CloneContext, $"Declavatar {controller.Playable}");
@@ -37,11 +41,9 @@ namespace KusakaFactory.Declavatar2.Ndmf
             var assets = new CloneContext(controllers.PlatformBindings);
             var mask = controller.Mask is AssetIndex maskIndex ? assets.Clone(_context.Resolver.Asset<AvatarMask>(maskIndex)) : null;
             var motions = new MotionGenerator(_context, controller.PathMode, assets);
-            var behaviors = new BehaviorGenerator(_context);
-            foreach (var layer in controller.Layers)
-            {
-                target.AddLayer(LayerPriority.Default, GenerateLayer(layer, motions, behaviors, mask));
-            }
+            var behaviors = new BehaviorGenerator(_context, controller, layerControls);
+            var layers = controller.Layers.Select(layer => GenerateLayer(layer, motions, behaviors, mask)).ToArray();
+            foreach (var layer in layers) target.AddLayer(LayerPriority.Default, layer);
             new AnimationIndex(new[] { target }).RewritePaths(path => _context.VirtualPath(controller.PathMode, path));
 
             var merge = _context.Declaration.gameObject.AddComponent<ModularAvatarMergeAnimator>();
@@ -54,6 +56,7 @@ namespace KusakaFactory.Declavatar2.Ndmf
             merge.matchAvatarWriteDefaults = _context.Declaration.MatchAvatarWriteDefaults;
             merge.deleteAttachedAnimator = false;
             controllers.Controllers[merge] = target;
+            return layers;
         }
 
         private VirtualLayer GenerateLayer(AnimatorLayer layer, MotionGenerator motions, BehaviorGenerator behaviors, VirtualAvatarMask mask)

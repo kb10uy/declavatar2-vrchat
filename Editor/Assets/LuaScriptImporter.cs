@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace KusakaFactory.Declavatar2.Assets
 {
-    [ScriptedImporter(1, "lua")]
+    [ScriptedImporter(2, new[] { "declua" }, new[] { "lua" })]
     public sealed class LuaScriptImporter : ScriptedImporter
     {
         public override void OnImportAsset(AssetImportContext ctx)

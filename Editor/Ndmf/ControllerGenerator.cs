@@ -98,7 +98,7 @@ namespace KusakaFactory.Declavatar2.Ndmf
 
             var from = states[transition.From.StateIndex.Value];
             var result = VirtualStateTransition.Create();
-            result.ExitTime = null;
+            result.ExitTime = conditions.IsEmpty ? 1f : null;
             result.Duration = (float)transition.Duration;
             result.HasFixedDuration = true;
             result.CanTransitionToSelf = false;

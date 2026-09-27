@@ -18,7 +18,7 @@ msgid "declavatar2.compile.transform"
 msgstr "Declaration error at {0}: {1}"
 
 msgid "declavatar2.resolve.object"
-msgstr "Object `{0}` was not found under `{1}` ({2} path, referenced at {3})"
+msgstr "GameObject `{0}` was not found under `{1}` ({2} path, referenced at {3})"
 
 msgid "declavatar2.resolve.component_type"
 msgstr "Component type `{0}` was not found (referenced at {1})"
@@ -42,22 +42,22 @@ msgid "declavatar2.generate.renderer_type"
 msgstr "Renderer type `{0}` was not found"
 
 msgid "declavatar2.generate.blend_shape"
-msgstr "Blend shape `{1}` with animation frames was not found on the skinned mesh at `{0}`"
+msgstr "BlendShape `{1}` was not found on the SkinnedMeshRenderer at `{0}`"
 
 msgid "declavatar2.generate.behaviour_type"
-msgstr "State behaviour type `{0}` was not found"
+msgstr "StateBehaviour type `{0}` was not found"
 
 msgid "declavatar2.generate.behaviour_field"
-msgstr "State behaviour `{0}` has no field `{1}`"
+msgstr "StateBehaviour `{0}` has no field `{1}`"
 
 msgid "declavatar2.generate.behaviour_value"
-msgstr "Field `{1}` of state behaviour `{0}` cannot take {2}"
+msgstr "Field `{1}` of StateBehaviour `{0}` cannot take {2}"
 
 msgid "declavatar2.inspector.script"
 msgstr "Script"
 
 msgid "declavatar2.inspector.script:tooltip"
-msgstr "The Lua script that declares this avatar"
+msgstr "The Lua script that defines the assets"
 
 msgid "declavatar2.inspector.symbols"
 msgstr "Symbols"

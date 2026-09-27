@@ -18,7 +18,7 @@ msgid "declavatar2.compile.transform"
 msgstr "宣言エラー ({0}): {1}"
 
 msgid "declavatar2.resolve.object"
-msgstr "オブジェクト `{0}` が `{1}` 以下に見つかりません ({2} パス、参照元 {3})"
+msgstr "GameObject `{0}` が `{1}` 以下に見つかりません ({2} パス、参照元 {3})"
 
 msgid "declavatar2.resolve.component_type"
 msgstr "コンポーネント型 `{0}` が見つかりません (参照元 {1})"
@@ -39,25 +39,25 @@ msgid "declavatar2.generate.width"
 msgstr "パラメータ `{0}` のビット幅 {1} は使えません。VRChat の Expression Parameter は 8 ビットです"
 
 msgid "declavatar2.generate.renderer_type"
-msgstr "レンダラー型 `{0}` が見つかりません"
+msgstr "Renderer 型 `{0}` が見つかりません"
 
 msgid "declavatar2.generate.blend_shape"
-msgstr "`{0}` のスキンドメッシュにフレームを持つ BlendShape `{1}` が見つかりません"
+msgstr "`{0}` の SkinnedMeshRenderer に BlendShape `{1}` が見つかりません"
 
 msgid "declavatar2.generate.behaviour_type"
-msgstr "State Behaviour 型 `{0}` が見つかりません"
+msgstr "StateBehaviour 型 `{0}` が見つかりません"
 
 msgid "declavatar2.generate.behaviour_field"
-msgstr "State Behaviour `{0}` にフィールド `{1}` がありません"
+msgstr "StateBehaviour `{0}` にフィールド `{1}` がありません"
 
 msgid "declavatar2.generate.behaviour_value"
-msgstr "State Behaviour `{0}` のフィールド `{1}` に {2} は設定できません"
+msgstr "StateBehaviour `{0}` のフィールド `{1}` に {2} は設定できません"
 
 msgid "declavatar2.inspector.script"
 msgstr "スクリプト"
 
 msgid "declavatar2.inspector.script:tooltip"
-msgstr "このアバターを宣言する Lua スクリプト"
+msgstr "アセットを定義する Lua スクリプト"
 
 msgid "declavatar2.inspector.symbols"
 msgstr "シンボル"

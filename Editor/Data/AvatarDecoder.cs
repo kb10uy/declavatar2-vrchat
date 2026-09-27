@@ -41,8 +41,9 @@ namespace KusakaFactory.Declavatar2.Data
 
         private static void CheckLayerControls(IReadOnlyList<PlayableController> controllers)
         {
-            foreach (var holder in controllers)
+            for (var index = 0; index < controllers.Count; index++)
             {
+                var holder = controllers[index];
                 var controls = holder.Layers
                     .SelectMany(layer => layer.States)
                     .SelectMany(state => state.Behaviors)
@@ -54,18 +55,13 @@ namespace KusakaFactory.Declavatar2.Data
                         throw new BlobDecodeException($"a layer control is held by a {holder.Playable} controller, whose layers cannot be controlled");
                     }
                     var reference = control.Layer;
-                    if (reference.Controller >= controllers.Count)
+                    if (reference.Controller != index)
                     {
-                        throw new BlobDecodeException($"controller index {reference.Controller} is out of range for an avatar of {controllers.Count} controllers");
+                        throw new BlobDecodeException($"a layer control in controller {index} refers to controller {reference.Controller}, but it can only refer to its own controller");
                     }
-                    var target = controllers[reference.Controller];
-                    if (target.Playable != holder.Playable)
+                    if (reference.Layer >= holder.Layers.Count)
                     {
-                        throw new BlobDecodeException($"a layer control in a {holder.Playable} controller refers to controller {reference.Controller}, which is {target.Playable}");
-                    }
-                    if (reference.Layer >= target.Layers.Count)
-                    {
-                        throw new BlobDecodeException($"layer index {reference.Layer} is out of range for controller {reference.Controller} of {target.Layers.Count} layers");
+                        throw new BlobDecodeException($"layer index {reference.Layer} is out of range for controller {index} of {holder.Layers.Count} layers");
                     }
                 }
             }

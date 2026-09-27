@@ -156,7 +156,7 @@ namespace KusakaFactory.Declavatar2.Ndmf
                         value = _context.Resolver.Asset(((AnimatedValue.ObjectReference)values[i]).Asset),
                     };
                 }
-                clip.SetObjectCurve(bindings[0], keys);
+                clip.SetObjectCurve(bindings[0], SpanLength(keys, length, static (key, time) => new ObjectReferenceKeyframe { time = time, value = key.value }, static key => key.time));
                 return;
             }
 
@@ -166,8 +166,17 @@ namespace KusakaFactory.Declavatar2.Ndmf
                 var keys = new Keyframe[times.Count];
                 for (var i = 0; i < keys.Length; i++) keys[i] = new Keyframe(times[i], components[i][component] * valueScale);
                 for (var i = 0; i < curve.Rest.Count; i++) ApplyInterpolation(keys, i, curve.Rest[i].Interpolation);
-                clip.SetFloatCurve(bindings[component], new AnimationCurve(keys));
+                clip.SetFloatCurve(bindings[component], new AnimationCurve(SpanLength(keys, length, static (key, time) => new Keyframe(time, key.value), static key => key.time)));
             }
+        }
+
+        private static T[] SpanLength<T>(T[] keys, float length, Func<T, float, T> hold, Func<T, float> timeOf)
+        {
+            var result = new List<T>(keys.Length + 2);
+            if (timeOf(keys[0]) > 0f) result.Add(hold(keys[0], 0f));
+            result.AddRange(keys);
+            if (timeOf(keys[keys.Length - 1]) < length) result.Add(hold(keys[keys.Length - 1], length));
+            return result.ToArray();
         }
 
         private static void ApplyInterpolation(Keyframe[] keys, int index, Interpolation interpolation)

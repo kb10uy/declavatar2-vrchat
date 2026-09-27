@@ -59,6 +59,52 @@ namespace KusakaFactory.Declavatar2.Data
             public double GoalWeight { get; }
             public double BlendDuration { get; }
         }
+
+        public sealed class LocomotionControl : Behavior
+        {
+            public LocomotionControl(bool disableLocomotion)
+            {
+                DisableLocomotion = disableLocomotion;
+            }
+
+            public bool DisableLocomotion { get; }
+        }
+
+        public sealed class TemporaryPoseSpace : Behavior
+        {
+            public TemporaryPoseSpace(bool enter, bool fixedDelay, double delay)
+            {
+                Enter = enter;
+                FixedDelay = fixedDelay;
+                Delay = delay;
+            }
+
+            public bool Enter { get; }
+            public bool FixedDelay { get; }
+            public double Delay { get; }
+        }
+
+        public sealed class PlayableLayerControl : Behavior
+        {
+            public PlayableLayerControl(BlendablePlayable playable, double goalWeight, double blendDuration)
+            {
+                Playable = playable;
+                GoalWeight = goalWeight;
+                BlendDuration = blendDuration;
+            }
+
+            public BlendablePlayable Playable { get; }
+            public double GoalWeight { get; }
+            public double BlendDuration { get; }
+        }
+    }
+
+    public enum BlendablePlayable : byte
+    {
+        Action = 0,
+        Fx = 1,
+        Gesture = 2,
+        Additive = 3,
     }
 
     public readonly struct LayerRef

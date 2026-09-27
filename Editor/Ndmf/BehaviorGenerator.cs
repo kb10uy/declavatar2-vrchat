@@ -50,6 +50,31 @@ namespace KusakaFactory.Declavatar2.Ndmf
                     case Behavior.LayerControl layerControl:
                         result.Add(Convert(layerControl));
                         break;
+                    case Behavior.LocomotionControl locomotion:
+                    {
+                        var control = ScriptableObject.CreateInstance<VRCAnimatorLocomotionControl>();
+                        control.disableLocomotion = locomotion.DisableLocomotion;
+                        result.Add(control);
+                        break;
+                    }
+                    case Behavior.TemporaryPoseSpace poseSpace:
+                    {
+                        var control = ScriptableObject.CreateInstance<VRCAnimatorTemporaryPoseSpace>();
+                        control.enterPoseSpace = poseSpace.Enter;
+                        control.fixedDelay = poseSpace.FixedDelay;
+                        control.delayTime = (float)poseSpace.Delay;
+                        result.Add(control);
+                        break;
+                    }
+                    case Behavior.PlayableLayerControl playableControl:
+                    {
+                        var control = ScriptableObject.CreateInstance<VRCPlayableLayerControl>();
+                        control.layer = (VRC_PlayableLayerControl.BlendableLayer)playableControl.Playable;
+                        control.goalWeight = (float)playableControl.GoalWeight;
+                        control.blendDuration = (float)playableControl.BlendDuration;
+                        result.Add(control);
+                        break;
+                    }
                     default:
                         throw new InvalidOperationException($"unknown behavior {behavior}");
                 }

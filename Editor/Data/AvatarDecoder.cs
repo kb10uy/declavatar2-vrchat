@@ -673,6 +673,22 @@ namespace KusakaFactory.Declavatar2.Data
                     var blendDuration = reader.ReadF64();
                     return new Behavior.LayerControl(new LayerRef(controller, layer), goalWeight, blendDuration);
                 }
+                case 4:
+                    return new Behavior.LocomotionControl(reader.ReadBool());
+                case 5:
+                {
+                    var enter = reader.ReadBool();
+                    var fixedDelay = reader.ReadBool();
+                    var delay = reader.ReadF64();
+                    return new Behavior.TemporaryPoseSpace(enter, fixedDelay, delay);
+                }
+                case 6:
+                {
+                    var playable = (BlendablePlayable)ReadDiscriminator(reader, "BlendablePlayable", 4);
+                    var goalWeight = reader.ReadF64();
+                    var blendDuration = reader.ReadF64();
+                    return new Behavior.PlayableLayerControl(playable, goalWeight, blendDuration);
+                }
                 default:
                     throw reader.InvalidDiscriminator("Behavior", tag);
             }

@@ -57,14 +57,46 @@ namespace KusakaFactory.Declavatar2.Data
 
     public sealed class AnimatorParameter
     {
-        public AnimatorParameter(string name, AnimatorParameterKind kind)
+        public AnimatorParameter(string name, AnimatorParameterKind kind, AnimatorParameterOrigin origin)
         {
             Name = name;
             Kind = kind;
+            Origin = origin;
         }
 
         public string Name { get; }
         public AnimatorParameterKind Kind { get; }
+        public AnimatorParameterOrigin Origin { get; }
+    }
+
+    public enum ProvidedParameterGroup : byte
+    {
+        Vrchat = 0,
+    }
+
+    public abstract class AnimatorParameterOrigin
+    {
+        private AnimatorParameterOrigin()
+        {
+        }
+
+        public sealed class Declared : AnimatorParameterOrigin
+        {
+        }
+
+        public sealed class Generated : AnimatorParameterOrigin
+        {
+        }
+
+        public sealed class Provided : AnimatorParameterOrigin
+        {
+            public Provided(ProvidedParameterGroup group)
+            {
+                Group = group;
+            }
+
+            public ProvidedParameterGroup Group { get; }
+        }
     }
 
     public abstract class AnimatorParameterKind

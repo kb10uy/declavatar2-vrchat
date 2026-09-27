@@ -214,7 +214,8 @@ namespace KusakaFactory.Declavatar2.Data
         {
             var name = reader.ReadString();
             var kind = ReadAnimatorParameterKind(reader);
-            return new AnimatorParameter(name, kind);
+            var origin = ReadAnimatorParameterOrigin(reader);
+            return new AnimatorParameter(name, kind, origin);
         }
 
         private static AnimatorParameterKind ReadAnimatorParameterKind(BlobReader reader)
@@ -226,6 +227,18 @@ namespace KusakaFactory.Declavatar2.Data
                 1 => new AnimatorParameterKind.Int(reader.ReadOptionValue(static r => r.ReadI32())),
                 2 => new AnimatorParameterKind.Float(reader.ReadOptionValue(static r => r.ReadF32())),
                 _ => throw reader.InvalidDiscriminator("AnimatorParameterKind", tag),
+            };
+        }
+
+        private static AnimatorParameterOrigin ReadAnimatorParameterOrigin(BlobReader reader)
+        {
+            var tag = reader.ReadU8();
+            return tag switch
+            {
+                0 => new AnimatorParameterOrigin.Declared(),
+                1 => new AnimatorParameterOrigin.Generated(),
+                2 => new AnimatorParameterOrigin.Provided((ProvidedParameterGroup)ReadDiscriminator(reader, "ProvidedParameterGroup", 1)),
+                _ => throw reader.InvalidDiscriminator("AnimatorParameterOrigin", tag),
             };
         }
 

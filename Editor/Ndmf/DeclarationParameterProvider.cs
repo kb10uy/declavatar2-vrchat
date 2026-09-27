@@ -41,6 +41,7 @@ namespace KusakaFactory.Declavatar2.Ndmf
             {
                 foreach (var parameter in controller.Parameters)
                 {
+                    if (parameter.Origin is AnimatorParameterOrigin.Provided) continue;
                     if (!names.Add(parameter.Name)) continue;
                     result.Add(new ProvidedParameter(parameter.Name, ParameterNamespace.Animator, _declaration, plugin, Convert(parameter.Kind.ValueType))
                     {

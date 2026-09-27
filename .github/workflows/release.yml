@@ -1,7 +1,6 @@
 name: "Build unitypackage"
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       da2-version:

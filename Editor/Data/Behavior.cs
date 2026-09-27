@@ -97,6 +97,89 @@ namespace KusakaFactory.Declavatar2.Data
             public double GoalWeight { get; }
             public double BlendDuration { get; }
         }
+
+        public sealed class PlayAudio : Behavior
+        {
+            public PlayAudio(
+                ObjectPathIndex? source,
+                PlaybackOrder order,
+                string orderParameter,
+                AudioSetting<IReadOnlyList<AssetIndex>> clips,
+                AudioSetting<AudioRange> volume,
+                AudioSetting<AudioRange> pitch,
+                AudioSetting<bool> loop,
+                double delay,
+                bool playOnEnter,
+                bool stopOnEnter,
+                bool playOnExit,
+                bool stopOnExit)
+            {
+                Source = source;
+                Order = order;
+                OrderParameter = orderParameter;
+                Clips = clips;
+                Volume = volume;
+                Pitch = pitch;
+                Loop = loop;
+                Delay = delay;
+                PlayOnEnter = playOnEnter;
+                StopOnEnter = stopOnEnter;
+                PlayOnExit = playOnExit;
+                StopOnExit = stopOnExit;
+            }
+
+            public ObjectPathIndex? Source { get; }
+            public PlaybackOrder Order { get; }
+            public string OrderParameter { get; }
+            public AudioSetting<IReadOnlyList<AssetIndex>> Clips { get; }
+            public AudioSetting<AudioRange> Volume { get; }
+            public AudioSetting<AudioRange> Pitch { get; }
+            public AudioSetting<bool> Loop { get; }
+            public double Delay { get; }
+            public bool PlayOnEnter { get; }
+            public bool StopOnEnter { get; }
+            public bool PlayOnExit { get; }
+            public bool StopOnExit { get; }
+        }
+    }
+
+    public enum PlaybackOrder : byte
+    {
+        Random = 0,
+        UniqueRandom = 1,
+        Roundabout = 2,
+        Parameter = 3,
+    }
+
+    public enum AudioApply : byte
+    {
+        Always = 0,
+        IfStopped = 1,
+        Never = 2,
+    }
+
+    public readonly struct AudioRange
+    {
+        public AudioRange(double min, double max)
+        {
+            Min = min;
+            Max = max;
+        }
+
+        public double Min { get; }
+        public double Max { get; }
+    }
+
+    public sealed class AudioSetting<T>
+    {
+        public AudioSetting(T value, AudioApply apply)
+        {
+            Value = value;
+            Apply = apply;
+        }
+
+        public T Value { get; }
+        public AudioApply Apply { get; }
     }
 
     public enum BlendablePlayable : byte

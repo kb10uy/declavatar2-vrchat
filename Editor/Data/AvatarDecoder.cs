@@ -689,9 +689,42 @@ namespace KusakaFactory.Declavatar2.Data
                     var blendDuration = reader.ReadF64();
                     return new Behavior.PlayableLayerControl(playable, goalWeight, blendDuration);
                 }
+                case 7:
+                    return ReadPlayAudio(reader);
                 default:
                     throw reader.InvalidDiscriminator("Behavior", tag);
             }
+        }
+
+        private static Behavior.PlayAudio ReadPlayAudio(BlobReader reader)
+        {
+            var source = reader.ReadOptionValue(ReadObjectPath);
+            var order = (PlaybackOrder)ReadDiscriminator(reader, "PlaybackOrder", 4);
+            var orderParameter = order == PlaybackOrder.Parameter ? ReadParameter(reader) : null;
+            var clips = ReadAudioSetting<IReadOnlyList<AssetIndex>>(reader, static r => r.ReadList(ReadAsset));
+            var volume = ReadAudioSetting(reader, ReadAudioRange);
+            var pitch = ReadAudioSetting(reader, ReadAudioRange);
+            var loop = ReadAudioSetting(reader, static r => r.ReadBool());
+            var delay = reader.ReadF64();
+            var playOnEnter = reader.ReadBool();
+            var stopOnEnter = reader.ReadBool();
+            var playOnExit = reader.ReadBool();
+            var stopOnExit = reader.ReadBool();
+            return new Behavior.PlayAudio(source, order, orderParameter, clips, volume, pitch, loop, delay, playOnEnter, stopOnEnter, playOnExit, stopOnExit);
+        }
+
+        private static AudioSetting<T> ReadAudioSetting<T>(BlobReader reader, Func<BlobReader, T> readValue)
+        {
+            var value = readValue(reader);
+            var apply = (AudioApply)ReadDiscriminator(reader, "AudioApply", 3);
+            return new AudioSetting<T>(value, apply);
+        }
+
+        private static AudioRange ReadAudioRange(BlobReader reader)
+        {
+            var min = reader.ReadF64();
+            var max = reader.ReadF64();
+            return new AudioRange(min, max);
         }
 
         private static ParameterDriveTarget ReadParameterDriveTarget(BlobReader reader)

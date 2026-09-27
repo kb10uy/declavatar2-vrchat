@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using KusakaFactory.Declavatar2.Data;
 using nadena.dev.ndmf;
 using UnityEditor;
@@ -73,6 +74,12 @@ namespace KusakaFactory.Declavatar2.Ndmf
                         control.goalWeight = (float)playableControl.GoalWeight;
                         control.blendDuration = (float)playableControl.BlendDuration;
                         result.Add(control);
+                        break;
+                    }
+                    case Behavior.PlayAudio playAudio:
+                    {
+                        var control = Convert(playAudio);
+                        if (control != null) result.Add(control);
                         break;
                     }
                     default:
@@ -182,6 +189,43 @@ namespace KusakaFactory.Declavatar2.Ndmf
             control.blendDuration = (float)layerControl.BlendDuration;
             _layerControls.Add((control, layerControl.Layer));
             return control;
+        }
+
+        private VRCAnimatorPlayAudio Convert(Behavior.PlayAudio playAudio)
+        {
+            var mode = _controller.PathMode;
+            var sourcePath = playAudio.Source is ObjectPathIndex source ? _context.ObjectPath(mode, source) : "";
+            if (sourcePath == null) return null;
+
+            var control = ScriptableObject.CreateInstance<VRCAnimatorPlayAudio>();
+            control.SourcePath = _context.VirtualPath(mode, sourcePath);
+            control.PlaybackOrder = (VRC_AnimatorPlayAudio.Order)playAudio.Order;
+            control.ParameterName = playAudio.OrderParameter ?? "";
+            control.Clips = playAudio.Clips.Value.Select(clip => _context.Resolver.Asset<AudioClip>(clip)).Where(clip => clip != null).ToArray();
+            control.ClipsApplySettings = ApplySettingsOf(playAudio.Clips.Apply);
+            control.Volume = new Vector2((float)playAudio.Volume.Value.Min, (float)playAudio.Volume.Value.Max);
+            control.VolumeApplySettings = ApplySettingsOf(playAudio.Volume.Apply);
+            control.Pitch = new Vector2((float)playAudio.Pitch.Value.Min, (float)playAudio.Pitch.Value.Max);
+            control.PitchApplySettings = ApplySettingsOf(playAudio.Pitch.Apply);
+            control.Loop = playAudio.Loop.Value;
+            control.LoopApplySettings = ApplySettingsOf(playAudio.Loop.Apply);
+            control.DelayInSeconds = (float)playAudio.Delay;
+            control.PlayOnEnter = playAudio.PlayOnEnter;
+            control.StopOnEnter = playAudio.StopOnEnter;
+            control.PlayOnExit = playAudio.PlayOnExit;
+            control.StopOnExit = playAudio.StopOnExit;
+            return control;
+        }
+
+        private static VRC_AnimatorPlayAudio.ApplySettings ApplySettingsOf(AudioApply apply)
+        {
+            switch (apply)
+            {
+                case AudioApply.Always: return VRC_AnimatorPlayAudio.ApplySettings.AlwaysApply;
+                case AudioApply.IfStopped: return VRC_AnimatorPlayAudio.ApplySettings.ApplyIfStopped;
+                case AudioApply.Never: return VRC_AnimatorPlayAudio.ApplySettings.NeverApply;
+                default: throw new ArgumentOutOfRangeException(nameof(apply), apply, null);
+            }
         }
 
         private static VRC_AnimatorLayerControl.BlendableLayer BlendableLayerOf(PlayableLayer playable)

@@ -65,6 +65,9 @@ msgstr "Symbols"
 msgid "declavatar2.inspector.symbols:tooltip"
 msgstr "Symbols passed to the script for conditional declaration"
 
+msgid "declavatar2.inspector.advanced"
+msgstr "Advanced"
+
 msgid "declavatar2.inspector.module-roots"
 msgstr "Module Roots"
 

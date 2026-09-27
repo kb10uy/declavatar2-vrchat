@@ -65,6 +65,9 @@ msgstr "シンボル"
 msgid "declavatar2.inspector.symbols:tooltip"
 msgstr "条件付き宣言のためにスクリプトへ渡すシンボル"
 
+msgid "declavatar2.inspector.advanced"
+msgstr "詳細設定"
+
 msgid "declavatar2.inspector.module-roots"
 msgstr "モジュールルート"
 

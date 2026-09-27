@@ -23,6 +23,9 @@ msgstr "GameObject `{0}` was not found under `{1}` ({2} path, referenced at {3})
 msgid "declavatar2.resolve.component_type"
 msgstr "Component type `{0}` was not found (referenced at {1})"
 
+msgid "declavatar2.resolve.behaviour_type"
+msgstr "StateBehaviour type `{0}` was not found (referenced at {1})"
+
 msgid "declavatar2.resolve.asset_type_unknown"
 msgstr "Asset type `{0}` of `{1}` was not found (referenced at {2})"
 
@@ -43,9 +46,6 @@ msgstr "Renderer type `{0}` was not found"
 
 msgid "declavatar2.generate.blend_shape"
 msgstr "BlendShape `{1}` was not found on the SkinnedMeshRenderer at `{0}`"
-
-msgid "declavatar2.generate.behaviour_type"
-msgstr "StateBehaviour type `{0}` was not found"
 
 msgid "declavatar2.generate.behaviour_field"
 msgstr "StateBehaviour `{0}` has no field `{1}`"

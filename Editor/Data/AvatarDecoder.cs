@@ -7,7 +7,14 @@ namespace KusakaFactory.Declavatar2.Data
     {
         public static Avatar ReadAvatar(BlobReader reader)
         {
-            var externals = ReadExternals(reader);
+            var objectPaths = ReadExternTable(reader, "object path", static r => r.ReadString());
+            var componentTypes = ReadExternTable(reader, "component type", static r => r.ReadString());
+            var assets = ReadExternTable(reader, "asset", ReadAssetLocator);
+            var needsRelativeRoot = reader.ReadBool();
+            reader.ObjectPathCount = objectPaths.Count;
+            reader.ComponentTypeUsages = new ComponentTypeUsage[componentTypes.Count];
+            reader.AssetCount = assets.Count;
+
             var expressionParameters = reader.ReadList(ReadExpressionParameter);
             var controllers = reader.ReadList(ReadPlayableController);
 
@@ -26,6 +33,7 @@ namespace KusakaFactory.Declavatar2.Data
             reader.Parameters = scope;
             var menu = reader.ReadList(ReadMenuItem);
 
+            var externals = new Externals(objectPaths, componentTypes, reader.ComponentTypeUsages, assets, needsRelativeRoot);
             return new Avatar(externals, expressionParameters, controllers, menu);
         }
 
@@ -37,18 +45,6 @@ namespace KusakaFactory.Declavatar2.Data
                 throw reader.InvalidDiscriminator(typeName, value);
             }
             return value;
-        }
-
-        private static Externals ReadExternals(BlobReader reader)
-        {
-            var objectPaths = ReadExternTable(reader, "object path", static r => r.ReadString());
-            var componentTypes = ReadExternTable(reader, "component type", static r => r.ReadString());
-            var assets = ReadExternTable(reader, "asset", ReadAssetLocator);
-            var needsRelativeRoot = reader.ReadBool();
-            reader.ObjectPathCount = objectPaths.Count;
-            reader.ComponentTypeCount = componentTypes.Count;
-            reader.AssetCount = assets.Count;
-            return new Externals(objectPaths, componentTypes, assets, needsRelativeRoot);
         }
 
         private static List<ExternEntry<T>> ReadExternTable<T>(BlobReader reader, string kind, Func<BlobReader, T> readValue)
@@ -112,9 +108,11 @@ namespace KusakaFactory.Declavatar2.Data
             return new ObjectPathIndex(ReadExternIndex(reader, "object path", reader.ObjectPathCount));
         }
 
-        private static ComponentTypeIndex ReadComponentType(BlobReader reader)
+        private static ComponentTypeIndex ReadComponentType(BlobReader reader, ComponentTypeUsage usage)
         {
-            return new ComponentTypeIndex(ReadExternIndex(reader, "component type", reader.ComponentTypeCount));
+            var index = ReadExternIndex(reader, "component type", reader.ComponentTypeUsages.Length);
+            reader.ComponentTypeUsages[index] |= usage;
+            return new ComponentTypeIndex(index);
         }
 
         private static AssetIndex ReadAsset(BlobReader reader)
@@ -511,7 +509,7 @@ namespace KusakaFactory.Declavatar2.Data
                 case 3:
                 {
                     var path = ReadObjectPath(reader);
-                    var componentType = ReadComponentType(reader);
+                    var componentType = ReadComponentType(reader, ComponentTypeUsage.AnimatedTarget);
                     var property = ReadComponentProperty(reader);
                     var valueType = (AnimatedValueType)ReadDiscriminator(reader, "AnimatedValueType", 9);
                     return new AnimatedTarget.Component(path, componentType, property, valueType);
@@ -629,9 +627,9 @@ namespace KusakaFactory.Declavatar2.Data
                 }
                 case 2:
                 {
-                    var typeName = reader.ReadString();
+                    var type = ReadComponentType(reader, ComponentTypeUsage.StateBehaviour);
                     var fields = reader.ReadMap(ReadGenericValue);
-                    return new Behavior.Generic(typeName, fields);
+                    return new Behavior.Generic(type, fields);
                 }
                 default:
                     throw reader.InvalidDiscriminator("Behavior", tag);

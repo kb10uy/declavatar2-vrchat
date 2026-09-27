@@ -23,6 +23,9 @@ msgstr "GameObject `{0}` が `{1}` 以下に見つかりません ({2} パス、
 msgid "declavatar2.resolve.component_type"
 msgstr "コンポーネント型 `{0}` が見つかりません (参照元 {1})"
 
+msgid "declavatar2.resolve.behaviour_type"
+msgstr "StateBehaviour 型 `{0}` が見つかりません (参照元 {1})"
+
 msgid "declavatar2.resolve.asset_type_unknown"
 msgstr "`{1}` のアセット型 `{0}` が見つかりません (参照元 {2})"
 
@@ -43,9 +46,6 @@ msgstr "Renderer 型 `{0}` が見つかりません"
 
 msgid "declavatar2.generate.blend_shape"
 msgstr "`{0}` の SkinnedMeshRenderer に BlendShape `{1}` が見つかりません"
-
-msgid "declavatar2.generate.behaviour_type"
-msgstr "StateBehaviour 型 `{0}` が見つかりません"
 
 msgid "declavatar2.generate.behaviour_field"
 msgstr "StateBehaviour `{0}` にフィールド `{1}` がありません"

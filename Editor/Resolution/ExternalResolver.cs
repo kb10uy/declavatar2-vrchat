@@ -12,6 +12,7 @@ namespace KusakaFactory.Declavatar2.Resolution
     {
         private readonly Externals _externals;
         private readonly Type[] _componentTypes;
+        private readonly Type[] _behaviourTypes;
         private readonly UnityEngine.Object[] _assets;
         private readonly Dictionary<(PathMode, int), GameObject> _objects = new Dictionary<(PathMode, int), GameObject>();
         private readonly HashSet<(int, Type)> _reportedMismatches = new HashSet<(int, Type)>();
@@ -22,7 +23,8 @@ namespace KusakaFactory.Declavatar2.Resolution
             _externals = externals;
             AbsoluteRoot = absoluteRoot;
             RelativeRoot = relativeRoot;
-            _componentTypes = externals.ComponentTypes.Select(ResolveComponentType).ToArray();
+            _componentTypes = ResolveTypes(ComponentTypeUsage.AnimatedTarget, TypeIndex.FindComponent, ResolutionErrorKind.ComponentTypeNotFound);
+            _behaviourTypes = ResolveTypes(ComponentTypeUsage.StateBehaviour, TypeIndex.FindStateMachineBehaviour, ResolutionErrorKind.BehaviourTypeNotFound);
             _assets = externals.Assets.Select(entry => ResolveAsset(entry, assetEntries)).ToArray();
         }
 
@@ -33,6 +35,11 @@ namespace KusakaFactory.Declavatar2.Resolution
         public Type ComponentType(ComponentTypeIndex index)
         {
             return _componentTypes[index.Index];
+        }
+
+        public Type BehaviourType(ComponentTypeIndex index)
+        {
+            return _behaviourTypes[index.Index];
         }
 
         public UnityEngine.Object Asset(AssetIndex index)
@@ -70,11 +77,17 @@ namespace KusakaFactory.Declavatar2.Resolution
             return found;
         }
 
-        private Type ResolveComponentType(ExternEntry<string> entry)
+        private Type[] ResolveTypes(ComponentTypeUsage usage, Func<string, Type> find, ResolutionErrorKind notFound)
         {
-            var type = TypeIndex.FindComponent(entry.Value);
-            if (type == null) Error(ResolutionErrorKind.ComponentTypeNotFound, entry.ReferencedAt, entry.Value);
-            return type;
+            var types = new Type[_externals.ComponentTypes.Count];
+            for (var i = 0; i < types.Length; i++)
+            {
+                if ((_externals.ComponentTypeUsages[i] & usage) == 0) continue;
+                var entry = _externals.ComponentTypes[i];
+                types[i] = find(entry.Value);
+                if (types[i] == null) Error(notFound, entry.ReferencedAt, entry.Value);
+            }
+            return types;
         }
 
         private UnityEngine.Object ResolveAsset(ExternEntry<AssetLocator> entry, IReadOnlyList<DeclavatarAssetDictionary.Entry> assetEntries)

@@ -37,6 +37,7 @@ namespace KusakaFactory.Declavatar2.Ndmf
             {
                 case ResolutionErrorKind.ObjectNotFound: key = "declavatar2.resolve.object"; break;
                 case ResolutionErrorKind.ComponentTypeNotFound: key = "declavatar2.resolve.component_type"; break;
+                case ResolutionErrorKind.BehaviourTypeNotFound: key = "declavatar2.resolve.behaviour_type"; break;
                 case ResolutionErrorKind.AssetTypeUnknown: key = "declavatar2.resolve.asset_type_unknown"; break;
                 case ResolutionErrorKind.AssetNotFound: key = "declavatar2.resolve.asset_not_found"; break;
                 case ResolutionErrorKind.AssetAmbiguous: key = "declavatar2.resolve.asset_ambiguous"; break;

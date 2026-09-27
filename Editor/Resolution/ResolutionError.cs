@@ -7,6 +7,7 @@ namespace KusakaFactory.Declavatar2.Resolution
     {
         ObjectNotFound,
         ComponentTypeNotFound,
+        BehaviourTypeNotFound,
         AssetTypeUnknown,
         AssetNotFound,
         AssetAmbiguous,

@@ -8,23 +8,34 @@ namespace KusakaFactory.Declavatar2.Data
         public Externals(
             IReadOnlyList<ExternEntry<string>> objectPaths,
             IReadOnlyList<ExternEntry<string>> componentTypes,
+            IReadOnlyList<ComponentTypeUsage> componentTypeUsages,
             IReadOnlyList<ExternEntry<AssetLocator>> assets,
             bool needsRelativeRoot)
         {
             ObjectPaths = objectPaths;
             ComponentTypes = componentTypes;
+            ComponentTypeUsages = componentTypeUsages;
             Assets = assets;
             NeedsRelativeRoot = needsRelativeRoot;
         }
 
         public IReadOnlyList<ExternEntry<string>> ObjectPaths { get; }
         public IReadOnlyList<ExternEntry<string>> ComponentTypes { get; }
+        public IReadOnlyList<ComponentTypeUsage> ComponentTypeUsages { get; }
         public IReadOnlyList<ExternEntry<AssetLocator>> Assets { get; }
         public bool NeedsRelativeRoot { get; }
 
         public ExternEntry<string> this[ObjectPathIndex index] => ObjectPaths[index.Index];
         public ExternEntry<string> this[ComponentTypeIndex index] => ComponentTypes[index.Index];
         public ExternEntry<AssetLocator> this[AssetIndex index] => Assets[index.Index];
+    }
+
+    [Flags]
+    public enum ComponentTypeUsage : byte
+    {
+        None = 0,
+        AnimatedTarget = 1,
+        StateBehaviour = 2,
     }
 
     public sealed class ExternEntry<T>

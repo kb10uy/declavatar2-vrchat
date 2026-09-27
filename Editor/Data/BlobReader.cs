@@ -21,7 +21,7 @@ namespace KusakaFactory.Declavatar2.Data
         }
 
         public int ObjectPathCount { get; set; }
-        public int ComponentTypeCount { get; set; }
+        public ComponentTypeUsage[] ComponentTypeUsages { get; set; } = Array.Empty<ComponentTypeUsage>();
         public int AssetCount { get; set; }
         public IReadOnlyDictionary<string, AnimatedValueType> Parameters { get; set; } = new Dictionary<string, AnimatedValueType>();
         public int? StateCount { get; set; }

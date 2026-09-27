@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using KusakaFactory.Declavatar2.Data;
-using KusakaFactory.Declavatar2.Resolution;
 using nadena.dev.ndmf;
 using UnityEditor;
 using UnityEngine;
@@ -145,22 +144,19 @@ namespace KusakaFactory.Declavatar2.Ndmf
 
         private StateMachineBehaviour Convert(Behavior.Generic generic)
         {
-            var type = TypeIndex.FindStateMachineBehaviour(generic.TypeName);
-            if (type == null)
-            {
-                _context.Report(ErrorSeverity.Error, "declavatar2.generate.behaviour_type", generic.TypeName);
-                return null;
-            }
+            var type = _context.Resolver.BehaviourType(generic.Type);
+            if (type == null) return null;
 
+            var typeName = _context.Avatar.Externals[generic.Type].Value;
             var instance = (StateMachineBehaviour)ScriptableObject.CreateInstance(type);
             var serialized = new SerializedObject(instance);
-            var writer = new GenericValueWriter(_context, generic.TypeName);
+            var writer = new GenericValueWriter(_context, typeName);
             foreach (var field in generic.Fields)
             {
                 var property = serialized.FindProperty(field.Key);
                 if (property == null)
                 {
-                    _context.Report(ErrorSeverity.Error, "declavatar2.generate.behaviour_field", generic.TypeName, field.Key);
+                    _context.Report(ErrorSeverity.Error, "declavatar2.generate.behaviour_field", typeName, field.Key);
                     continue;
                 }
                 writer.Write(property, field.Value);

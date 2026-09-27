@@ -36,13 +36,13 @@ namespace KusakaFactory.Declavatar2.Data
 
         public sealed class Generic : Behavior
         {
-            public Generic(string typeName, IReadOnlyDictionary<string, GenericValue> fields)
+            public Generic(ComponentTypeIndex type, IReadOnlyDictionary<string, GenericValue> fields)
             {
-                TypeName = typeName;
+                Type = type;
                 Fields = fields;
             }
 
-            public string TypeName { get; }
+            public ComponentTypeIndex Type { get; }
             public IReadOnlyDictionary<string, GenericValue> Fields { get; }
         }
     }

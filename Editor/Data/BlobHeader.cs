@@ -7,7 +7,7 @@ namespace KusakaFactory.Declavatar2.Data
     {
         public const int Length = 16;
         public const ushort SchemaVersion = 1;
-        public const ushort AvatarDataVersion = 2;
+        public const ushort AvatarDataVersion = 3;
         public const ushort DiagnosticsDataVersion = 1;
 
         private const uint AvatarMagic = 0x61324144;

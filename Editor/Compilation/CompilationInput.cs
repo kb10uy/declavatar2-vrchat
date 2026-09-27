@@ -59,10 +59,15 @@ namespace KusakaFactory.Declavatar2.Compilation
                 .ToArray();
 
             var libraryPaths = new List<string>();
-            if (scriptPath.Length > 0) libraryPaths.Add(Path.GetDirectoryName(Path.GetFullPath(scriptPath)));
-            libraryPaths.AddRange(moduleRootPaths.Select(Path.GetFullPath));
+            if (scriptPath.Length > 0) libraryPaths.Add(Path.GetDirectoryName(PhysicalPath(scriptPath)));
+            libraryPaths.AddRange(moduleRootPaths.Select(PhysicalPath));
 
             return new CompilationInput(scriptPath, chunkName, declaration.Script.text, symbols, moduleRootPaths, libraryPaths);
+        }
+
+        private static string PhysicalPath(string assetPath)
+        {
+            return Path.GetFullPath(FileUtil.GetPhysicalPath(assetPath));
         }
 
         private static Hash128 Fingerprint(IReadOnlyList<string> libraryPaths)

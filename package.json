@@ -1,7 +1,7 @@
 {
     "name": "org.kb10uy.declavatar2",
     "displayName": "Declavatar 2",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "unity": "2022.3",
     "description": "Declarative Avatar Asset Composing Tool; Revised",
     "documentationUrl": "https://declavatar2.kb10uy.dev",

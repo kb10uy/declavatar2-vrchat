@@ -47,12 +47,12 @@ namespace KusakaFactory.Declavatar2.Data
 
         public sealed class Radial : MenuItem
         {
-            public Radial(string name, MenuAxis axis) : base(name)
+            public Radial(string name, string parameter) : base(name)
             {
-                Axis = axis;
+                Parameter = parameter;
             }
 
-            public MenuAxis Axis { get; }
+            public string Parameter { get; }
         }
 
         public sealed class TwoAxis : MenuItem
@@ -69,7 +69,7 @@ namespace KusakaFactory.Declavatar2.Data
 
         public sealed class FourAxis : MenuItem
         {
-            public FourAxis(string name, MenuAxis up, MenuAxis down, MenuAxis left, MenuAxis right) : base(name)
+            public FourAxis(string name, MenuDirection up, MenuDirection down, MenuDirection left, MenuDirection right) : base(name)
             {
                 Up = up;
                 Down = down;
@@ -77,10 +77,10 @@ namespace KusakaFactory.Declavatar2.Data
                 Right = right;
             }
 
-            public MenuAxis Up { get; }
-            public MenuAxis Down { get; }
-            public MenuAxis Left { get; }
-            public MenuAxis Right { get; }
+            public MenuDirection Up { get; }
+            public MenuDirection Down { get; }
+            public MenuDirection Left { get; }
+            public MenuDirection Right { get; }
         }
     }
 
@@ -96,5 +96,17 @@ namespace KusakaFactory.Declavatar2.Data
         public string Parameter { get; }
         public string Positive { get; }
         public string Negative { get; }
+    }
+
+    public sealed class MenuDirection
+    {
+        public MenuDirection(string parameter, string label)
+        {
+            Parameter = parameter;
+            Label = label;
+        }
+
+        public string Parameter { get; }
+        public string Label { get; }
     }
 }

@@ -71,7 +71,7 @@ namespace KusakaFactory.Declavatar2.Ndmf
                     break;
                 case MenuItem.Radial radial:
                     control.type = VRCExpressionsMenu.Control.ControlType.RadialPuppet;
-                    control.subParameters = new[] { Parameter(radial.Axis.Parameter) };
+                    control.subParameters = new[] { Parameter(radial.Parameter) };
                     break;
                 case MenuItem.TwoAxis twoAxis:
                     control.type = VRCExpressionsMenu.Control.ControlType.TwoAxisPuppet;
@@ -95,10 +95,10 @@ namespace KusakaFactory.Declavatar2.Ndmf
                     };
                     control.labels = new[]
                     {
-                        Label(fourAxis.Up.Positive),
-                        Label(fourAxis.Right.Positive),
-                        Label(fourAxis.Down.Positive),
-                        Label(fourAxis.Left.Positive),
+                        Label(fourAxis.Up.Label),
+                        Label(fourAxis.Right.Label),
+                        Label(fourAxis.Down.Label),
+                        Label(fourAxis.Left.Label),
                     };
                     break;
                 default:

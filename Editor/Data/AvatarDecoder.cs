@@ -739,8 +739,8 @@ namespace KusakaFactory.Declavatar2.Data
                 case 3:
                 {
                     var name = reader.ReadString();
-                    var axis = ReadMenuAxis(reader);
-                    return new MenuItem.Radial(name, axis);
+                    var parameter = ReadParameter(reader);
+                    return new MenuItem.Radial(name, parameter);
                 }
                 case 4:
                 {
@@ -752,10 +752,10 @@ namespace KusakaFactory.Declavatar2.Data
                 case 5:
                 {
                     var name = reader.ReadString();
-                    var up = ReadMenuAxis(reader);
-                    var down = ReadMenuAxis(reader);
-                    var left = ReadMenuAxis(reader);
-                    var right = ReadMenuAxis(reader);
+                    var up = ReadMenuDirection(reader);
+                    var down = ReadMenuDirection(reader);
+                    var left = ReadMenuDirection(reader);
+                    var right = ReadMenuDirection(reader);
                     return new MenuItem.FourAxis(name, up, down, left, right);
                 }
                 default:
@@ -769,6 +769,13 @@ namespace KusakaFactory.Declavatar2.Data
             var positive = reader.ReadOption(static r => r.ReadString());
             var negative = reader.ReadOption(static r => r.ReadString());
             return new MenuAxis(parameter, positive, negative);
+        }
+
+        private static MenuDirection ReadMenuDirection(BlobReader reader)
+        {
+            var parameter = ReadParameter(reader);
+            var label = reader.ReadOption(static r => r.ReadString());
+            return new MenuDirection(parameter, label);
         }
     }
 }

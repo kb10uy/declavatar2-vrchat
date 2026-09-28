@@ -11,6 +11,7 @@ using AnimatorCondition = KusakaFactory.Declavatar2.Data.AnimatorCondition;
 using AnimatorLayer = KusakaFactory.Declavatar2.Data.AnimatorLayer;
 using AnimatorTransition = KusakaFactory.Declavatar2.Data.AnimatorTransition;
 using UnityCondition = UnityEditor.Animations.AnimatorCondition;
+using UnityBlendingMode = UnityEditor.Animations.AnimatorLayerBlendingMode;
 using UnityConditionMode = UnityEditor.Animations.AnimatorConditionMode;
 using UnityController = UnityEditor.Animations.AnimatorController;
 
@@ -42,7 +43,9 @@ namespace KusakaFactory.Declavatar2.Ndmf
             var mask = controller.Mask is AssetIndex maskIndex ? assets.Clone(_context.Resolver.Asset<AvatarMask>(maskIndex)) : null;
             var motions = new MotionGenerator(_context, controller.PathMode, assets);
             var behaviors = new BehaviorGenerator(_context, controller, layerControls);
-            var layers = controller.Layers.Select(layer => GenerateLayer(layer, motions, behaviors, mask)).ToArray();
+            var layers = controller.Layers
+                .Select(layer => GenerateLayer(layer, motions, behaviors, MaskOf(layer, assets) ?? mask))
+                .ToArray();
             foreach (var layer in layers) target.AddLayer(LayerPriority.Default, layer);
             new AnimationIndex(new[] { target }).RewritePaths(path => _context.VirtualPath(controller.PathMode, path));
 
@@ -65,7 +68,8 @@ namespace KusakaFactory.Declavatar2.Ndmf
             var root = VirtualStateMachine.Create(clone, layer.Name);
             var result = VirtualLayer.Create(clone, layer.Name);
             result.StateMachine = root;
-            result.DefaultWeight = 1f;
+            result.DefaultWeight = (float)layer.Settings.Weight;
+            result.BlendingMode = layer.Settings.Blending == LayerBlending.Additive ? UnityBlendingMode.Additive : UnityBlendingMode.Override;
             result.AvatarMask = mask;
 
             var machines = layer.Machines.Select(machine => VirtualStateMachine.Create(clone, machine.Name)).ToArray();
@@ -96,6 +100,11 @@ namespace KusakaFactory.Declavatar2.Ndmf
             foreach (var transition in layer.Transitions) AddTransition(layer, root, machines, states, transition);
 
             return result;
+        }
+
+        private VirtualAvatarMask MaskOf(AnimatorLayer layer, CloneContext assets)
+        {
+            return layer.Settings.Mask is AssetIndex index ? assets.Clone(_context.Resolver.Asset<AvatarMask>(index)) : null;
         }
 
         private static VirtualStateMachine MachineOf(VirtualStateMachine root, VirtualStateMachine[] machines, int? index)

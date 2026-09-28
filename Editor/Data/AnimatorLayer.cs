@@ -7,12 +7,14 @@ namespace KusakaFactory.Declavatar2.Data
     {
         public AnimatorLayer(
             string name,
+            LayerSettings settings,
             int? defaultState,
             IReadOnlyList<StateMachine> machines,
             IReadOnlyList<AnimatorState> states,
             IReadOnlyList<AnimatorTransition> transitions)
         {
             Name = name;
+            Settings = settings;
             DefaultState = defaultState;
             Machines = machines;
             States = states;
@@ -20,10 +22,31 @@ namespace KusakaFactory.Declavatar2.Data
         }
 
         public string Name { get; }
+        public LayerSettings Settings { get; }
         public int? DefaultState { get; }
         public IReadOnlyList<StateMachine> Machines { get; }
         public IReadOnlyList<AnimatorState> States { get; }
         public IReadOnlyList<AnimatorTransition> Transitions { get; }
+    }
+
+    public sealed class LayerSettings
+    {
+        public LayerSettings(double weight, LayerBlending blending, AssetIndex? mask)
+        {
+            Weight = weight;
+            Blending = blending;
+            Mask = mask;
+        }
+
+        public double Weight { get; }
+        public LayerBlending Blending { get; }
+        public AssetIndex? Mask { get; }
+    }
+
+    public enum LayerBlending : byte
+    {
+        Override = 0,
+        Additive = 1,
     }
 
     public sealed class StateMachine

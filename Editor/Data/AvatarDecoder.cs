@@ -273,6 +273,7 @@ namespace KusakaFactory.Declavatar2.Data
         private static AnimatorLayer ReadAnimatorLayer(BlobReader reader)
         {
             var name = reader.ReadString();
+            var settings = ReadLayerSettings(reader);
             var defaultStateIndex = reader.ReadOptionValue(static r => r.ReadU32());
             var writtenMachines = reader.ReadList(ReadWrittenMachine);
             for (var i = 0; i < writtenMachines.Count; i++)
@@ -293,7 +294,15 @@ namespace KusakaFactory.Declavatar2.Data
                     machine.Parent is uint parent ? (int)parent : null,
                     machine.DefaultState is uint state ? CheckStateIndex(state, states.Count) : null))
                 .ToList();
-            return new AnimatorLayer(name, defaultState, machines, states, transitions);
+            return new AnimatorLayer(name, settings, defaultState, machines, states, transitions);
+        }
+
+        private static LayerSettings ReadLayerSettings(BlobReader reader)
+        {
+            var weight = reader.ReadF64();
+            var blending = (LayerBlending)ReadDiscriminator(reader, "LayerBlending", 2);
+            var mask = reader.ReadOptionValue(ReadAsset);
+            return new LayerSettings(weight, blending, mask);
         }
 
         private static (string Name, uint? Parent, uint? DefaultState) ReadWrittenMachine(BlobReader reader)

@@ -274,12 +274,48 @@ namespace KusakaFactory.Declavatar2.Data
         {
             var name = reader.ReadString();
             var defaultStateIndex = reader.ReadOptionValue(static r => r.ReadU32());
+            var writtenMachines = reader.ReadList(ReadWrittenMachine);
+            for (var i = 0; i < writtenMachines.Count; i++)
+            {
+                if (writtenMachines[i].Parent is uint parent) CheckMachineIndex(parent, i);
+            }
+            reader.MachineCount = writtenMachines.Count;
             var states = reader.ReadList(ReadAnimatorState);
-            int? defaultState = defaultStateIndex is uint index ? CheckStateIndex(index, states.Count) : null;
             reader.StateCount = states.Count;
             var transitions = reader.ReadList(ReadAnimatorTransition);
             reader.StateCount = null;
-            return new AnimatorLayer(name, defaultState, states, transitions);
+            reader.MachineCount = null;
+
+            int? defaultState = defaultStateIndex is uint index ? CheckStateIndex(index, states.Count) : null;
+            var machines = writtenMachines
+                .Select(machine => new StateMachine(
+                    machine.Name,
+                    machine.Parent is uint parent ? (int)parent : null,
+                    machine.DefaultState is uint state ? CheckStateIndex(state, states.Count) : null))
+                .ToList();
+            return new AnimatorLayer(name, defaultState, machines, states, transitions);
+        }
+
+        private static (string Name, uint? Parent, uint? DefaultState) ReadWrittenMachine(BlobReader reader)
+        {
+            var name = reader.ReadString();
+            var parent = reader.ReadOptionValue(static r => r.ReadU32());
+            var defaultState = reader.ReadOptionValue(static r => r.ReadU32());
+            return (name, parent, defaultState);
+        }
+
+        private static int CheckMachineIndex(uint index, int count)
+        {
+            if (index >= (uint)count)
+            {
+                throw new BlobDecodeException($"state machine index {index} is out of range for the {count} state machines it may refer to");
+            }
+            return (int)index;
+        }
+
+        private static int ReadMachineIndex(BlobReader reader)
+        {
+            return CheckMachineIndex(reader.ReadU32(), reader.MachineCount ?? 0);
         }
 
         private static int CheckStateIndex(uint index, int count)
@@ -299,13 +335,14 @@ namespace KusakaFactory.Declavatar2.Data
         private static AnimatorState ReadAnimatorState(BlobReader reader)
         {
             var name = reader.ReadString();
+            var machine = reader.ReadOptionValue(ReadMachineIndex);
             var motion = reader.ReadOption(ReadMotion);
             var speed = reader.ReadF64();
             var speedBy = reader.ReadOption(ReadParameter);
             var timeBy = reader.ReadOption(ReadParameter);
             var writeDefaults = reader.ReadBool();
             var behaviors = reader.ReadList(ReadBehavior);
-            return new AnimatorState(name, motion, speed, speedBy, timeBy, writeDefaults, behaviors);
+            return new AnimatorState(name, machine, motion, speed, speedBy, timeBy, writeDefaults, behaviors);
         }
 
         private static AnimatorTransition ReadAnimatorTransition(BlobReader reader)
@@ -322,8 +359,9 @@ namespace KusakaFactory.Declavatar2.Data
             var tag = reader.ReadU8();
             return tag switch
             {
-                0 => TransitionSource.Entry,
+                0 => TransitionSource.Entry(reader.ReadOptionValue(ReadMachineIndex)),
                 1 => TransitionSource.State(ReadStateIndex(reader)),
+                2 => TransitionSource.MachineExit(ReadMachineIndex(reader)),
                 _ => throw reader.InvalidDiscriminator("TransitionSource", tag),
             };
         }
@@ -335,6 +373,7 @@ namespace KusakaFactory.Declavatar2.Data
             {
                 0 => TransitionTarget.State(ReadStateIndex(reader)),
                 1 => TransitionTarget.Exit,
+                2 => TransitionTarget.Machine(ReadMachineIndex(reader)),
                 _ => throw reader.InvalidDiscriminator("TransitionTarget", tag),
             };
         }

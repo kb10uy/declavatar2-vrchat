@@ -62,18 +62,21 @@ namespace KusakaFactory.Declavatar2.Ndmf
         private VirtualLayer GenerateLayer(AnimatorLayer layer, MotionGenerator motions, BehaviorGenerator behaviors, VirtualAvatarMask mask)
         {
             var clone = _context.Services.ControllerContext.CloneContext;
-            var machine = VirtualStateMachine.Create(clone, layer.Name);
+            var root = VirtualStateMachine.Create(clone, layer.Name);
             var result = VirtualLayer.Create(clone, layer.Name);
-            result.StateMachine = machine;
+            result.StateMachine = root;
             result.DefaultWeight = 1f;
             result.AvatarMask = mask;
 
+            var machines = layer.Machines.Select(machine => VirtualStateMachine.Create(clone, machine.Name)).ToArray();
+            var slots = new Dictionary<VirtualStateMachine, int>();
             var states = new VirtualState[layer.States.Count];
             for (var i = 0; i < states.Length; i++)
             {
                 var source = layer.States[i];
+                var holder = MachineOf(root, machines, source.Machine);
                 var motion = motions.Generate(source.Motion, $"{layer.Name}/{source.Name}");
-                var state = machine.AddState(source.Name, motion, PositionOf(i));
+                var state = holder.AddState(source.Name, motion, PositionOf(NextSlot(slots, holder)));
                 state.Speed = (float)source.Speed;
                 state.SpeedParameter = source.SpeedBy;
                 state.TimeParameter = source.TimeBy;
@@ -81,22 +84,62 @@ namespace KusakaFactory.Declavatar2.Ndmf
                 state.Behaviours = behaviors.Generate(source.Behaviors);
                 states[i] = state;
             }
-            if (layer.DefaultState is int defaultState) machine.DefaultState = states[defaultState];
-            foreach (var transition in layer.Transitions) AddTransition(machine, states, transition);
+            for (var i = 0; i < machines.Length; i++)
+            {
+                var source = layer.Machines[i];
+                var parent = MachineOf(root, machines, source.Parent);
+                var child = new VirtualStateMachine.VirtualChildStateMachine { StateMachine = machines[i], Position = PositionOf(NextSlot(slots, parent)) };
+                parent.StateMachines = parent.StateMachines.Add(child);
+                if (source.DefaultState is int machineDefault) machines[i].DefaultState = states[machineDefault];
+            }
+            if (layer.DefaultState is int defaultState) root.DefaultState = states[defaultState];
+            foreach (var transition in layer.Transitions) AddTransition(layer, root, machines, states, transition);
 
             return result;
         }
 
-        private static void AddTransition(VirtualStateMachine machine, VirtualState[] states, AnimatorTransition transition)
+        private static VirtualStateMachine MachineOf(VirtualStateMachine root, VirtualStateMachine[] machines, int? index)
+        {
+            return index is int machine ? machines[machine] : root;
+        }
+
+        private static int NextSlot(Dictionary<VirtualStateMachine, int> slots, VirtualStateMachine machine)
+        {
+            slots.TryGetValue(machine, out var slot);
+            slots[machine] = slot + 1;
+            return slot;
+        }
+
+        private static void AddTransition(
+            AnimatorLayer layer,
+            VirtualStateMachine root,
+            VirtualStateMachine[] machines,
+            VirtualState[] states,
+            AnimatorTransition transition)
         {
             var conditions = transition.Conditions.Select(Convert).ToImmutableList();
-            if (transition.From.IsEntry)
+            switch (transition.From.Kind)
             {
-                var entry = VirtualTransition.Create();
-                SetDestination(entry, states, transition.To);
-                entry.Conditions = conditions;
-                machine.EntryTransitions = machine.EntryTransitions.Add(entry);
-                return;
+                case TransitionSourceKind.Entry:
+                {
+                    var holder = MachineOf(root, machines, transition.From.MachineIndex);
+                    var entry = VirtualTransition.Create();
+                    SetDestination(entry, machines, states, transition.To);
+                    entry.Conditions = conditions;
+                    holder.EntryTransitions = holder.EntryTransitions.Add(entry);
+                    return;
+                }
+                case TransitionSourceKind.MachineExit:
+                {
+                    var exited = transition.From.MachineIndex.Value;
+                    var holder = MachineOf(root, machines, layer.Machines[exited].Parent);
+                    var leaving = VirtualTransition.Create();
+                    SetDestination(leaving, machines, states, transition.To);
+                    leaving.Conditions = conditions;
+                    var existing = holder.StateMachineTransitions.TryGetValue(machines[exited], out var list) ? list : ImmutableList<VirtualTransition>.Empty;
+                    holder.StateMachineTransitions = holder.StateMachineTransitions.SetItem(machines[exited], existing.Add(leaving));
+                    return;
+                }
             }
 
             var from = states[transition.From.StateIndex.Value];
@@ -106,15 +149,25 @@ namespace KusakaFactory.Declavatar2.Ndmf
             result.HasFixedDuration = true;
             result.CanTransitionToSelf = false;
             result.InterruptionSource = UnityEditor.Animations.TransitionInterruptionSource.None;
-            SetDestination(result, states, transition.To);
+            SetDestination(result, machines, states, transition.To);
             result.Conditions = conditions;
             from.Transitions = from.Transitions.Add(result);
         }
 
-        private static void SetDestination(VirtualTransitionBase transition, VirtualState[] states, TransitionTarget target)
+        private static void SetDestination(VirtualTransitionBase transition, VirtualStateMachine[] machines, VirtualState[] states, TransitionTarget target)
         {
-            if (target.IsExit) transition.SetExitDestination();
-            else transition.SetDestination(states[target.StateIndex.Value]);
+            switch (target.Kind)
+            {
+                case TransitionTargetKind.Exit:
+                    transition.SetExitDestination();
+                    break;
+                case TransitionTargetKind.Machine:
+                    transition.SetDestination(machines[target.MachineIndex.Value]);
+                    break;
+                default:
+                    transition.SetDestination(states[target.StateIndex.Value]);
+                    break;
+            }
         }
 
         private static UnityCondition Convert(AnimatorCondition condition)

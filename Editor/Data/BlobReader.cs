@@ -25,6 +25,7 @@ namespace KusakaFactory.Declavatar2.Data
         public int AssetCount { get; set; }
         public IReadOnlyDictionary<string, AnimatedValueType> Parameters { get; set; } = new Dictionary<string, AnimatedValueType>();
         public int? StateCount { get; set; }
+        public int? MachineCount { get; set; }
 
         public int Offset => _position - _start;
         public int Remaining => _bytes.Length - _position;

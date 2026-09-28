@@ -8,25 +8,43 @@ namespace KusakaFactory.Declavatar2.Data
         public AnimatorLayer(
             string name,
             int? defaultState,
+            IReadOnlyList<StateMachine> machines,
             IReadOnlyList<AnimatorState> states,
             IReadOnlyList<AnimatorTransition> transitions)
         {
             Name = name;
             DefaultState = defaultState;
+            Machines = machines;
             States = states;
             Transitions = transitions;
         }
 
         public string Name { get; }
         public int? DefaultState { get; }
+        public IReadOnlyList<StateMachine> Machines { get; }
         public IReadOnlyList<AnimatorState> States { get; }
         public IReadOnlyList<AnimatorTransition> Transitions { get; }
+    }
+
+    public sealed class StateMachine
+    {
+        public StateMachine(string name, int? parent, int? defaultState)
+        {
+            Name = name;
+            Parent = parent;
+            DefaultState = defaultState;
+        }
+
+        public string Name { get; }
+        public int? Parent { get; }
+        public int? DefaultState { get; }
     }
 
     public sealed class AnimatorState
     {
         public AnimatorState(
             string name,
+            int? machine,
             Motion motion,
             double speed,
             string speedBy,
@@ -35,6 +53,7 @@ namespace KusakaFactory.Declavatar2.Data
             IReadOnlyList<Behavior> behaviors)
         {
             Name = name;
+            Machine = machine;
             Motion = motion;
             Speed = speed;
             SpeedBy = speedBy;
@@ -44,6 +63,7 @@ namespace KusakaFactory.Declavatar2.Data
         }
 
         public string Name { get; }
+        public int? Machine { get; }
         public Motion Motion { get; }
         public double Speed { get; }
         public string SpeedBy { get; }
@@ -72,26 +92,44 @@ namespace KusakaFactory.Declavatar2.Data
         public IReadOnlyList<AnimatorCondition> Conditions { get; }
     }
 
+    public enum TransitionSourceKind
+    {
+        Entry,
+        State,
+        MachineExit,
+    }
+
     public readonly struct TransitionSource : IEquatable<TransitionSource>
     {
-        private TransitionSource(int? stateIndex)
+        private TransitionSource(TransitionSourceKind kind, int? stateIndex, int? machineIndex)
         {
+            Kind = kind;
             StateIndex = stateIndex;
+            MachineIndex = machineIndex;
         }
 
-        public static TransitionSource Entry => new TransitionSource(null);
+        public static TransitionSource Entry(int? machine)
+        {
+            return new TransitionSource(TransitionSourceKind.Entry, null, machine);
+        }
 
         public static TransitionSource State(int index)
         {
-            return new TransitionSource(index);
+            return new TransitionSource(TransitionSourceKind.State, index, null);
         }
 
+        public static TransitionSource MachineExit(int machine)
+        {
+            return new TransitionSource(TransitionSourceKind.MachineExit, null, machine);
+        }
+
+        public TransitionSourceKind Kind { get; }
         public int? StateIndex { get; }
-        public bool IsEntry => StateIndex is null;
+        public int? MachineIndex { get; }
 
         public bool Equals(TransitionSource other)
         {
-            return StateIndex == other.StateIndex;
+            return Kind == other.Kind && StateIndex == other.StateIndex && MachineIndex == other.MachineIndex;
         }
 
         public override bool Equals(object obj)
@@ -101,35 +139,55 @@ namespace KusakaFactory.Declavatar2.Data
 
         public override int GetHashCode()
         {
-            return StateIndex ?? -1;
+            return HashCode.Combine(Kind, StateIndex, MachineIndex);
         }
 
         public override string ToString()
         {
-            return StateIndex is int index ? $"state #{index}" : "entry";
+            return Kind switch
+            {
+                TransitionSourceKind.Entry => MachineIndex is int machine ? $"entry of machine #{machine}" : "entry",
+                TransitionSourceKind.State => $"state #{StateIndex}",
+                _ => $"exit of machine #{MachineIndex}",
+            };
         }
+    }
+
+    public enum TransitionTargetKind
+    {
+        State,
+        Exit,
+        Machine,
     }
 
     public readonly struct TransitionTarget : IEquatable<TransitionTarget>
     {
-        private TransitionTarget(int? stateIndex)
+        private TransitionTarget(TransitionTargetKind kind, int? stateIndex, int? machineIndex)
         {
+            Kind = kind;
             StateIndex = stateIndex;
+            MachineIndex = machineIndex;
         }
 
-        public static TransitionTarget Exit => new TransitionTarget(null);
+        public static TransitionTarget Exit => new TransitionTarget(TransitionTargetKind.Exit, null, null);
 
         public static TransitionTarget State(int index)
         {
-            return new TransitionTarget(index);
+            return new TransitionTarget(TransitionTargetKind.State, index, null);
         }
 
+        public static TransitionTarget Machine(int index)
+        {
+            return new TransitionTarget(TransitionTargetKind.Machine, null, index);
+        }
+
+        public TransitionTargetKind Kind { get; }
         public int? StateIndex { get; }
-        public bool IsExit => StateIndex is null;
+        public int? MachineIndex { get; }
 
         public bool Equals(TransitionTarget other)
         {
-            return StateIndex == other.StateIndex;
+            return Kind == other.Kind && StateIndex == other.StateIndex && MachineIndex == other.MachineIndex;
         }
 
         public override bool Equals(object obj)
@@ -139,12 +197,17 @@ namespace KusakaFactory.Declavatar2.Data
 
         public override int GetHashCode()
         {
-            return StateIndex ?? -1;
+            return HashCode.Combine(Kind, StateIndex, MachineIndex);
         }
 
         public override string ToString()
         {
-            return StateIndex is int index ? $"state #{index}" : "exit";
+            return Kind switch
+            {
+                TransitionTargetKind.State => $"state #{StateIndex}",
+                TransitionTargetKind.Machine => $"machine #{MachineIndex}",
+                _ => "exit",
+            };
         }
     }
 

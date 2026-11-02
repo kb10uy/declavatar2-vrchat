@@ -1,6 +1,5 @@
 using KusakaFactory.Declavatar2.Data;
 using nadena.dev.modular_avatar.core;
-using nadena.dev.ndmf;
 
 namespace KusakaFactory.Declavatar2.Ndmf
 {
@@ -42,13 +41,13 @@ namespace KusakaFactory.Declavatar2.Ndmf
                     if (b.Default is bool boolDefault) SetDefault(ref config, boolDefault ? 1f : 0f);
                     break;
                 case ExpressionParameterKind.Int i:
-                    CheckWidth(parameter.Name, i.Width);
                     config.syncType = ParameterSyncType.Int;
+                    SetNumericFormat(ref config, i.Width, i.Signedness);
                     if (i.Default is int intDefault) SetDefault(ref config, intDefault);
                     break;
                 case ExpressionParameterKind.Float f:
-                    CheckWidth(parameter.Name, f.Width);
                     config.syncType = ParameterSyncType.Float;
+                    SetNumericFormat(ref config, f.Width, f.Signedness);
                     if (f.Default is float floatDefault) SetDefault(ref config, floatDefault);
                     break;
             }
@@ -61,12 +60,15 @@ namespace KusakaFactory.Declavatar2.Ndmf
             config.hasExplicitDefaultValue = true;
         }
 
-        private void CheckWidth(string name, byte? width)
+        private static void SetNumericFormat(ref ParameterConfig config, byte? width, ExpressionParameterSignedness? signedness)
         {
-            if (width is byte w && w != 8)
+            config.bitWidth = width ?? 0;
+            config.representation = signedness switch
             {
-                _context.Report(ErrorSeverity.Error, "declavatar2.generate.width", name, w.ToString());
-            }
+                ExpressionParameterSignedness.Unsigned => ParameterRepresentation.Unsigned,
+                ExpressionParameterSignedness.Signed => ParameterRepresentation.Signed,
+                _ => ParameterRepresentation.Default,
+            };
         }
     }
 }

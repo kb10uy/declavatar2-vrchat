@@ -30,12 +30,22 @@ namespace KusakaFactory.Declavatar2.Ndmf
             foreach (var parameter in compiled.Avatar.ExpressionParameters)
             {
                 names.Add(parameter.Name);
-                result.Add(new ProvidedParameter(parameter.Name, ParameterNamespace.Animator, _declaration, plugin, Convert(parameter.Kind.ValueType))
+                var provided = new ProvidedParameter(parameter.Name, ParameterNamespace.Animator, _declaration, plugin, Convert(parameter.Kind.ValueType))
                 {
                     WantSynced = parameter.Synced,
                     IsAnimatorOnly = false,
                     DefaultValue = DefaultOf(parameter.Kind),
-                });
+                };
+                switch (parameter.Kind)
+                {
+                    case ExpressionParameterKind.Int i:
+                        SetNumericFormat(provided, i.Width, i.Signedness);
+                        break;
+                    case ExpressionParameterKind.Float f:
+                        SetNumericFormat(provided, f.Width, f.Signedness);
+                        break;
+                }
+                result.Add(provided);
             }
             foreach (var controller in compiled.Avatar.Controllers)
             {
@@ -73,6 +83,20 @@ namespace KusakaFactory.Declavatar2.Ndmf
                 case AnimatedValueType.Bool: return AnimatorControllerParameterType.Bool;
                 case AnimatedValueType.Int: return AnimatorControllerParameterType.Int;
                 default: return AnimatorControllerParameterType.Float;
+            }
+        }
+
+        private static void SetNumericFormat(ProvidedParameter provided, byte? width, ExpressionParameterSignedness? signedness)
+        {
+            provided.NumericBitWidth = width;
+            switch (signedness)
+            {
+                case ExpressionParameterSignedness.Unsigned:
+                    provided.Signedness = ParameterSignedness.Unsigned;
+                    break;
+                case ExpressionParameterSignedness.Signed:
+                    provided.Signedness = ParameterSignedness.Signed;
+                    break;
             }
         }
 

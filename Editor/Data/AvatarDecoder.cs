@@ -205,14 +205,16 @@ namespace KusakaFactory.Declavatar2.Data
                 case 1:
                 {
                     var width = ReadWidth(reader);
+                    var signedness = ReadSignedness(reader);
                     var defaultValue = reader.ReadOptionValue(static r => r.ReadI32());
-                    return new ExpressionParameterKind.Int(width, defaultValue);
+                    return new ExpressionParameterKind.Int(width, signedness, defaultValue);
                 }
                 case 2:
                 {
                     var width = ReadWidth(reader);
+                    var signedness = ReadSignedness(reader);
                     var defaultValue = reader.ReadOptionValue(static r => r.ReadF32());
-                    return new ExpressionParameterKind.Float(width, defaultValue);
+                    return new ExpressionParameterKind.Float(width, signedness, defaultValue);
                 }
                 default:
                     throw reader.InvalidDiscriminator("ExpressionParameterKind", tag);
@@ -222,7 +224,18 @@ namespace KusakaFactory.Declavatar2.Data
         private static byte? ReadWidth(BlobReader reader)
         {
             var width = reader.ReadU8();
-            return width == 0 ? (byte?)null : width;
+            if (width == 0) return null;
+            if (width < 2 || width > 8)
+            {
+                throw new BlobDecodeException($"{width} is not a bit width of an expression parameter");
+            }
+            return width;
+        }
+
+        private static ExpressionParameterSignedness? ReadSignedness(BlobReader reader)
+        {
+            var signedness = ReadDiscriminator(reader, "ExpressionParameterSignedness", 3);
+            return signedness == 0 ? (ExpressionParameterSignedness?)null : (ExpressionParameterSignedness)signedness;
         }
 
         private static PlayableController ReadPlayableController(BlobReader reader)

@@ -14,9 +14,9 @@
         "url": "https://kb10uy.org"
     },
     "vpmDependencies": {
-        "com.vrchat.avatars" : ">=3.10.0",
-        "nadena.dev.ndmf": ">=1.14.0",
-        "nadena.dev.modular-avatar": ">=1.18.0"
+        "com.vrchat.avatars" : ">=3.10.6",
+        "nadena.dev.ndmf": ">=1.15.0-beta.4",
+        "nadena.dev.modular-avatar": ">=1.19.0-beta.0"
     },
     "dependencies": {
     }

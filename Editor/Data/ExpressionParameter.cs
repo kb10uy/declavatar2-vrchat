@@ -16,6 +16,12 @@ namespace KusakaFactory.Declavatar2.Data
         public bool Synced { get; }
     }
 
+    public enum ExpressionParameterSignedness : byte
+    {
+        Unsigned = 1,
+        Signed = 2,
+    }
+
     public abstract class ExpressionParameterKind
     {
         private ExpressionParameterKind()
@@ -38,13 +44,15 @@ namespace KusakaFactory.Declavatar2.Data
 
         public sealed class Int : ExpressionParameterKind
         {
-            public Int(byte? width, int? defaultValue)
+            public Int(byte? width, ExpressionParameterSignedness? signedness, int? defaultValue)
             {
                 Width = width;
+                Signedness = signedness;
                 Default = defaultValue;
             }
 
             public byte? Width { get; }
+            public ExpressionParameterSignedness? Signedness { get; }
             public int? Default { get; }
 
             public override AnimatedValueType ValueType => AnimatedValueType.Int;
@@ -52,13 +60,15 @@ namespace KusakaFactory.Declavatar2.Data
 
         public sealed class Float : ExpressionParameterKind
         {
-            public Float(byte? width, float? defaultValue)
+            public Float(byte? width, ExpressionParameterSignedness? signedness, float? defaultValue)
             {
                 Width = width;
+                Signedness = signedness;
                 Default = defaultValue;
             }
 
             public byte? Width { get; }
+            public ExpressionParameterSignedness? Signedness { get; }
             public float? Default { get; }
 
             public override AnimatedValueType ValueType => AnimatedValueType.Float;

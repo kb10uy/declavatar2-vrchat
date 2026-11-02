@@ -1,0 +1,12 @@
+-- vim: ft=lua
+
+local da = require("declavatar");
+
+return da.avatar({
+    parameters = {
+    },
+    controllers = {
+    },
+    menu = {
+    },
+});

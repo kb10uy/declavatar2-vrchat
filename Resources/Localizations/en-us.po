@@ -38,9 +38,6 @@ msgstr "Asset {0} matched {1} assets; add it to an asset dictionary (referenced 
 msgid "declavatar2.resolve.asset_type_mismatch"
 msgstr "Asset {0} is a {1}, but a {2} is required (referenced at {3})"
 
-msgid "declavatar2.generate.width"
-msgstr "Parameter `{0}` declares a width of {1} bits, but VRChat expression parameters are 8 bits"
-
 msgid "declavatar2.generate.renderer_type"
 msgstr "Renderer type `{0}` was not found"
 

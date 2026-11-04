@@ -141,6 +141,65 @@ namespace KusakaFactory.Declavatar2.Data
             public bool PlayOnExit { get; }
             public bool StopOnExit { get; }
         }
+
+        public sealed class BlendshapesSetWeight : Behavior
+        {
+            public BlendshapesSetWeight(string name, BlendshapesSetSource source, double lerpSpeed)
+            {
+                Name = name;
+                Source = source;
+                LerpSpeed = lerpSpeed;
+            }
+
+            public string Name { get; }
+            public BlendshapesSetSource Source { get; }
+            public double LerpSpeed { get; }
+        }
+    }
+
+    public abstract class BlendshapesSetSource
+    {
+        private BlendshapesSetSource()
+        {
+        }
+
+        public sealed class Value : BlendshapesSetSource
+        {
+            public Value(double weight)
+            {
+                Weight = weight;
+            }
+
+            public double Weight { get; }
+        }
+
+        public sealed class Parameter : BlendshapesSetSource
+        {
+            public Parameter(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; }
+        }
+
+        public sealed class RangedParameter : BlendshapesSetSource
+        {
+            public RangedParameter(string name, double fromMin, double fromMax, double toMin, double toMax)
+            {
+                Name = name;
+                FromMin = fromMin;
+                FromMax = fromMax;
+                ToMin = toMin;
+                ToMax = toMax;
+            }
+
+            public string Name { get; }
+            public double FromMin { get; }
+            public double FromMax { get; }
+            public double ToMin { get; }
+            public double ToMax { get; }
+        }
     }
 
     public enum PlaybackOrder : byte

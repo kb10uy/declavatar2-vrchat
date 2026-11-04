@@ -13,6 +13,8 @@ namespace KusakaFactory.Declavatar2.Ndmf
 {
     internal sealed class BehaviorGenerator
     {
+        private const int MaxBlendSetsPerBehavior = 64;
+
         private readonly GenerationContext _context;
         private readonly PlayableController _controller;
         private readonly List<(VRCAnimatorLayerControl, LayerRef)> _layerControls;
@@ -28,6 +30,7 @@ namespace KusakaFactory.Declavatar2.Ndmf
         {
             var result = new List<StateMachineBehaviour>();
             VRCAvatarParameterDriver driver = null;
+            VRCAnimatorFaceTrackingBlendshapesSet blendshapesSet = null;
             foreach (var behavior in behaviors)
             {
                 switch (behavior)
@@ -82,6 +85,15 @@ namespace KusakaFactory.Declavatar2.Ndmf
                         if (control != null) result.Add(control);
                         break;
                     }
+                    case Behavior.BlendshapesSetWeight blendshapesSetWeight:
+                        if (blendshapesSet == null || blendshapesSet.blendSets.Count == MaxBlendSetsPerBehavior)
+                        {
+                            blendshapesSet = ScriptableObject.CreateInstance<VRCAnimatorFaceTrackingBlendshapesSet>();
+                            blendshapesSet.blendSets = new List<VRC_AnimatorFaceTrackingBlendshapesSet.BlendSet>();
+                            result.Add(blendshapesSet);
+                        }
+                        blendshapesSet.blendSets.Add(Convert(blendshapesSetWeight));
+                        break;
                     default:
                         throw new InvalidOperationException($"unknown behavior {behavior}");
                 }
@@ -215,6 +227,45 @@ namespace KusakaFactory.Declavatar2.Ndmf
             control.PlayOnExit = playAudio.PlayOnExit;
             control.StopOnExit = playAudio.StopOnExit;
             return control;
+        }
+
+        private static VRC_AnimatorFaceTrackingBlendshapesSet.BlendSet Convert(Behavior.BlendshapesSetWeight weight)
+        {
+            var blendSet = new VRC_AnimatorFaceTrackingBlendshapesSet.BlendSet
+            {
+                type = VRC_AnimatorFaceTrackingBlendshapesSet.SourceType.Value,
+                sourceParameter = "",
+                blendshapesSetName = weight.Name,
+                weight = 1.0f,
+                convertRange = false,
+                sourceMin = 0.0f,
+                sourceMax = 1.0f,
+                destMin = 0.0f,
+                destMax = 1.0f,
+                lerpSpeed = (float)weight.LerpSpeed,
+            };
+            switch (weight.Source)
+            {
+                case BlendshapesSetSource.Value value:
+                    blendSet.weight = (float)value.Weight;
+                    break;
+                case BlendshapesSetSource.Parameter parameter:
+                    blendSet.type = VRC_AnimatorFaceTrackingBlendshapesSet.SourceType.Parameter;
+                    blendSet.sourceParameter = parameter.Name;
+                    break;
+                case BlendshapesSetSource.RangedParameter ranged:
+                    blendSet.type = VRC_AnimatorFaceTrackingBlendshapesSet.SourceType.Parameter;
+                    blendSet.sourceParameter = ranged.Name;
+                    blendSet.convertRange = true;
+                    blendSet.sourceMin = (float)ranged.FromMin;
+                    blendSet.sourceMax = (float)ranged.FromMax;
+                    blendSet.destMin = (float)ranged.ToMin;
+                    blendSet.destMax = (float)ranged.ToMax;
+                    break;
+                default:
+                    throw new InvalidOperationException($"unknown blendshapes set source {weight.Source}");
+            }
+            return blendSet;
         }
 
         private static VRC_AnimatorPlayAudio.ApplySettings ApplySettingsOf(AudioApply apply)

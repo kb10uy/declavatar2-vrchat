@@ -748,8 +748,38 @@ namespace KusakaFactory.Declavatar2.Data
                 }
                 case 7:
                     return ReadPlayAudio(reader);
+                case 8:
+                {
+                    var name = reader.ReadString();
+                    var source = ReadBlendshapesSetSource(reader);
+                    var lerpSpeed = reader.ReadF64();
+                    return new Behavior.BlendshapesSetWeight(name, source, lerpSpeed);
+                }
                 default:
                     throw reader.InvalidDiscriminator("Behavior", tag);
+            }
+        }
+
+        private static BlendshapesSetSource ReadBlendshapesSetSource(BlobReader reader)
+        {
+            var tag = reader.ReadU8();
+            switch (tag)
+            {
+                case 0:
+                    return new BlendshapesSetSource.Value(reader.ReadF64());
+                case 1:
+                    return new BlendshapesSetSource.Parameter(ReadParameter(reader));
+                case 2:
+                {
+                    var parameter = ReadParameter(reader);
+                    var fromMin = reader.ReadF64();
+                    var fromMax = reader.ReadF64();
+                    var toMin = reader.ReadF64();
+                    var toMax = reader.ReadF64();
+                    return new BlendshapesSetSource.RangedParameter(parameter, fromMin, fromMax, toMin, toMax);
+                }
+                default:
+                    throw reader.InvalidDiscriminator("BlendshapesSetSource", tag);
             }
         }
 

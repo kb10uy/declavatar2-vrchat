@@ -10,6 +10,8 @@ namespace KusakaFactory.Declavatar2.Compilation
 {
     public sealed class CompilationInput
     {
+        public const string DebugSymbol = "_DEBUG";
+
         private CompilationInput(
             string scriptPath,
             string chunkName,
@@ -47,6 +49,7 @@ namespace KusakaFactory.Declavatar2.Compilation
             var scriptPath = AssetDatabase.GetAssetPath(declaration.Script) ?? "";
             var chunkName = scriptPath.Length > 0 ? scriptPath : declaration.Script.name + ".lua";
             var symbols = (declaration.Symbols ?? Array.Empty<string>())
+                .Concat(UsesDebugSymbol() ? new[] { DebugSymbol } : Array.Empty<string>())
                 .Where(s => !string.IsNullOrEmpty(s))
                 .Distinct()
                 .OrderBy(s => s, StringComparer.Ordinal)
@@ -63,6 +66,11 @@ namespace KusakaFactory.Declavatar2.Compilation
             libraryPaths.AddRange(moduleRootPaths.Select(PhysicalPath));
 
             return new CompilationInput(scriptPath, chunkName, declaration.Script.text, symbols, moduleRootPaths, libraryPaths);
+        }
+
+        public static bool UsesDebugSymbol()
+        {
+            return DeclavatarSettings.instance.DebugSymbolInPlayMode && EditorApplication.isPlayingOrWillChangePlaymode;
         }
 
         private static string PhysicalPath(string assetPath)
